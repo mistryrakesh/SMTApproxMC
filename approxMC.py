@@ -66,51 +66,46 @@ def generateEquationConstraint(varMap, primesMap, maxBitwidth, slices):
     generateEquationConstraint.counter += 1
     k = maxBitwidth
     twoPowerK = 2 ** k
-    prime = primesMap[maxBitwidth / slices]
-    print prime
+    prime = primesMap[int(math.ceil(float(maxBitwidth) / slices))]
 
-    newBitwidth = maxBitwidth + int(math.ceil(math.log(slices * len(varMap), 2))) + 1
+    newBitwidth = maxBitwidth + int(math.ceil(math.log(slices * len(varMap), 2))) + 1 # +1 since 's' can be upto 'prime-1'
 
     primeCoeff = "temp_prime_coeff_" + str(generateEquationConstraint.counter)
     primeCoeffDecl = "(declare-fun " + primeCoeff + " () (_ BitVec " + str(newBitwidth - (maxBitwidth + 1)) + "))\n"
 
     bvmulList = []
     for key in varMap.keys():
-        if varMap[key] > 1: # subdivide if width > 1
-            keyDivWidth = varMap[key] / slices
-            bitRemaining = varMap[key] % slices
+        if varMap[key] != maxBitwidth:
+            key = zeroExtendExpr(maxBitwidth - varMap[key], key)
 
-            if keyDivWidth == 0:
-                slices = bitRemaining
+        assert maxBitwidth >= slices
 
-            keyDivWidthList = [keyDivWidth] * slices
+        keyDivWidth = maxBitwidth / slices
+        bitRemaining = maxBitwidth % slices
+        
+        keyDivWidthList = [keyDivWidth] * slices
+            
+        for i in range(bitRemaining):
+            keyDivWidthList[i] += 1
 
-            for i in range(bitRemaining):
-                keyDivWidthList[i] += 1
+        coeff = []
+        for i in range(slices):
+            coeff.append(random.randint(0, twoPowerK - 1))
 
-            coeff = []
-            for i in range(slices):
-                coeff.append(random.randint(0, twoPowerK - 1))
+        keyDivs = []
+        msbPos = maxBitwidth - 1
+        for i in range(slices):
+            keyDivs.append(extractExpr(msbPos, msbPos - keyDivWidthList[i] + 1, key))
+            msbPos = msbPos - keyDivWidthList[i]
 
-            keyDivs = []
-            msbPos = varMap[key] - 1
-            for i in range(slices):
-                keyDivs.append(extractExpr(msbPos, msbPos - keyDivWidthList[i] + 1, key))
-                msbPos = msbPos - keyDivWidthList[i]
+        zxtndKeyDivs = []
+        for i in range(slices):
+            zxtndKeyDivs.append(zeroExtendExpr(newBitwidth - keyDivWidthList[i], keyDivs[i]))
 
-            zxtndKeyDivs = []
-            for i in range(slices):
-                zxtndKeyDivs.append(zeroExtendExpr(newBitwidth - keyDivWidthList[i], keyDivs[i]))
+        bvmulStrs = []
+        for i in range(slices):
+            bvmulList.append(bvmulExpr(constExpr(coeff[i], newBitwidth), zxtndKeyDivs[i]))
 
-            bvmulStrs = []
-            for i in range(slices):
-                bvmulList.append(bvmulExpr(constExpr(coeff[i], newBitwidth), zxtndKeyDivs[i]))
-
-        else:
-            coeff = random.randint(0, twoPowerK - 1)
-            zxtndKey = zeroExtendExpr(newBitwidth - varMap[key], key)
-            bvmulStr = bvmulExpr(constExpr(coeff, newBitwidth), zxtndKey)
-            bvmulList.append(bvmulStr)
 
     lhsStr = reduce(lambda x, y: bvaddExpr(x, y), bvmulList)
 
@@ -119,7 +114,7 @@ def generateEquationConstraint(varMap, primesMap, maxBitwidth, slices):
 
     rhsStr = bvaddExpr(bvmulExpr(constExpr(prime, newBitwidth), s), constExpr(r, newBitwidth))
     constraint = eqExpr(lhsStr, rhsStr)
-    return constraint, primeCoeffDecl
+    return constraint, primeCoeffDecl, prime
 
 
 # Function: parseSmt2File
@@ -247,22 +242,25 @@ def main(argv):
 
     tempSMT2FileName = tempDir + "/temp.smt2"
     tempOutputFile = tempDir + "/solverResults.txt"
+    tempErrorFile = tempDir + "/solverErrors.txt"
     tempSMT1FileName = tempDir + "/temp.smt1"
 
     constraintList = []
     coeffDeclList = []
+    primeList = []
 
     if not os.path.exists(tempDir):
         os.makedirs(tempDir)
 
     slices = 2
-    timeout = 2400
+    timeout = 2500
     minPivot = 1
-    maxPivot = 52
+    maxPivot = 10
 
-    (constraint, coeffDecl) = generateEquationConstraint(varMap, primesMap, maxBitwidth, slices)
+    (constraint, coeffDecl, prime) = generateEquationConstraint(varMap, primesMap, maxBitwidth, slices)
     constraintList.append(constraint)
     coeffDeclList.append(coeffDecl)
+    primeList.append(prime)
 
     while True:
         generateSMT2FileFromConstraints(smt2prefix, coeffDeclList, constraintList, smt2suffix, tempSMT2FileName)
@@ -271,29 +269,36 @@ def main(argv):
             sys.stderr.write("Error while converting from SMT2 File to SMT1 file. Aborting ...\n")
             exit(1)
 
-        cmd = smtSolver + " -i -m -t " + str(timeout) + " --maxsolutions=" + str(maxPivot) + " " + tempSMT1FileName + " >" + tempOutputFile;
+        cmd = smtSolver + " -i -m -t " + str(timeout) + " --maxsolutions=" + str(maxPivot) + " " + tempSMT1FileName + " >" + tempOutputFile + " 2>>" + tempErrorFile;
         os.system(cmd)
         numSolutions = countSolutions(tempOutputFile)
 
         print "numConstraints: " + str(len(constraintList)) + ", slices: " + str(slices) + ", numSolutions: " + str(numSolutions)
         
         if numSolutions >= minPivot:
-            (constraint, coeffDecl) = generateEquationConstraint(varMap, primesMap, maxBitwidth, slices)
+            (constraint, coeffDecl, prime) = generateEquationConstraint(varMap, primesMap, maxBitwidth, slices)
             constraintList.append(constraint)
             coeffDeclList.append(coeffDecl)
+            primeList.append(prime)
 
         elif numSolutions >= 0:
             constraintList.pop()
             coeffDeclList.pop()
+            primeList.pop()
+
             if (slices >= maxBitwidth):
                 break
-            slices = slices * 2;
 
-            (constraint, coeffDecl) = generateEquationConstraint(varMap, primesMap, maxBitwidth, slices)
+            slices = (slices * 2) if (slices * 2) < maxBitwidth else maxBitwidth;
+
+            (constraint, coeffDecl, prime) = generateEquationConstraint(varMap, primesMap, maxBitwidth, slices)
             constraintList.append(constraint)
             coeffDeclList.append(coeffDecl)
+            primeList.append(prime)
 
-    print "slices: " + str(slices)
+        # raw_input("Press Enter to continue...")
+
+    print "primeList: " + str(primeList)
 
 if __name__ == "__main__":
     main(sys.argv)
