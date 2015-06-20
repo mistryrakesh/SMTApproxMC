@@ -66,7 +66,8 @@ def generateEquationConstraint(varMap, primesMap, maxBitwidth, slices):
     generateEquationConstraint.counter += 1
     k = maxBitwidth
     twoPowerK = 2 ** k
-    prime = primesMap[maxBitwidth]
+    prime = primesMap[maxBitwidth / slices]
+    print prime
 
     newBitwidth = maxBitwidth + int(math.ceil(math.log(slices * len(varMap), 2))) + 1
 
@@ -255,9 +256,9 @@ def main(argv):
         os.makedirs(tempDir)
 
     slices = 2
-    timeout = 30
-    minPivot = 5
-    maxPivot = 10
+    timeout = 2400
+    minPivot = 1
+    maxPivot = 52
 
     (constraint, coeffDecl) = generateEquationConstraint(varMap, primesMap, maxBitwidth, slices)
     constraintList.append(constraint)
@@ -274,7 +275,7 @@ def main(argv):
         os.system(cmd)
         numSolutions = countSolutions(tempOutputFile)
 
-        print "slices: " + str(slices) + ", numSolutions: " + str(numSolutions)
+        print "numConstraints: " + str(len(constraintList)) + ", slices: " + str(slices) + ", numSolutions: " + str(numSolutions)
         
         if numSolutions >= minPivot:
             (constraint, coeffDecl) = generateEquationConstraint(varMap, primesMap, maxBitwidth, slices)
