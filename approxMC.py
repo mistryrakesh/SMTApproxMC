@@ -43,7 +43,7 @@ def andExpr(var1, var2):
 #         Each line is of the form -- k prime
 #         where for every number 'k' the value of 'prime' is smallest prime > 2^k
 #
-# updates global map 'primesMap' of prime numbers for 2^k (1 <= k <= 100)
+# returns map of prime numbers for 2^k (1 <= k <= 100)
 def populatePrimesMap(primesFile):
     primesMap = {}
     for line in primesFile:
@@ -52,6 +52,22 @@ def populatePrimesMap(primesFile):
         primesMap[k] = int(strList[1])
 
     return primesMap
+
+
+# Function: populatePrimesMap
+# @param: primesMap - file containing primes.
+#         Each line is of the form -- k prime
+#         where for every number 'k' the value of 'prime' is smallest prime > 2^k
+#
+# returns map of prime numbers for 2^k (1 <= k <= 100)
+def populateEpsilonMap(probFile):
+    epsilonMap = {}
+    for line in probFile:
+        strList = line.rstrip().split(":")
+        k = int(strList[0])
+        epsilonMap[k] = float(strList[1])
+
+    return epsilonMap
 
 
 # Function: generateEquationConstraint
@@ -64,14 +80,16 @@ def populatePrimesMap(primesFile):
 #     a1x1 + a2x2 + ... = s*prime + r
 def generateEquationConstraint(varMap, primesMap, maxBitwidth, slices):
     generateEquationConstraint.counter += 1
-    k = maxBitwidth
-    twoPowerK = 2 ** k
-    prime = primesMap[int(math.ceil(float(maxBitwidth) / slices))]
 
-    newBitwidth = maxBitwidth + int(math.ceil(math.log(slices * len(varMap), 2))) + 1 # +1 since 's' can be upto 'prime-1'
+    k = int(math.ceil(float(maxBitwidth) / slices))
+
+    twoPowerK = 2 ** k
+    prime = primesMap[k]
+
+    newBitwidth = k + int(math.ceil(math.log(slices * len(varMap), 2))) + 1 # +1 since 's' can be upto 'prime-1'
 
     primeCoeff = "temp_prime_coeff_" + str(generateEquationConstraint.counter)
-    primeCoeffDecl = "(declare-fun " + primeCoeff + " () (_ BitVec " + str(newBitwidth - (maxBitwidth + 1)) + "))\n"
+    primeCoeffDecl = "(declare-fun " + primeCoeff + " () (_ BitVec " + str(newBitwidth - (k + 1)) + "))\n"
 
     bvmulList = []
     for key in varMap.keys():
@@ -80,9 +98,11 @@ def generateEquationConstraint(varMap, primesMap, maxBitwidth, slices):
 
         assert maxBitwidth >= slices
 
+        # find slice widths of variable
         keyDivWidth = maxBitwidth / slices
         bitRemaining = maxBitwidth % slices
         
+        # list containing width of each variable slice
         keyDivWidthList = [keyDivWidth] * slices
             
         for i in range(bitRemaining):
@@ -202,13 +222,13 @@ def generateSMT1FromSMT2File(smt2FileName, smt1FileName):
 # Funtion: countSolutions
 def countSolutions(smtResultsFileName):
     smtResultsFile = open(smtResultsFileName, "r")
+    count = 0
 
     for line in smtResultsFile:
-        strList = line.split();
-        if strList[0] == "numSolutions":
-            return int(strList[1])
+        if line == "sat\n":
+            count += 1
 
-    return 0
+    return count
 
 
 # Function: main
@@ -219,16 +239,18 @@ def main(argv):
 
     # check for correct number of arguments
     scriptName = os.path.basename(__file__)
-    if len(argv) < 2:
+    if len(argv) < 4:
         sys.stderr.write("Error: Invalid arguments.\n")
-        sys.stderr.write("    [Usage]: " + scriptName + " <input_SMT2_file> <primes_file>\n")
+        sys.stderr.write("    [Usage]: " + scriptName + " <input_SMT2_file> <primes_file> <prob_map_file>\n")
         sys.exit(1)
 
     # open files
     inputSMTFile = open(argv[1], "r")
     primesFile = open(argv[2], "r")
+    probMapFile = open(argv[3], "r")
 
     primesMap = populatePrimesMap(primesFile)
+    epsilonMap = populateEpsilonMap(probMapFile)
 
     (varMap, smt2prefix) = parseSmt2FileVariables(inputSMTFile)
     smt2suffix = parseSmt2FileSuffix(inputSMTFile, "true")
@@ -255,7 +277,10 @@ def main(argv):
     slices = 2
     timeout = 2500
     minPivot = 1
-    maxPivot = 10
+
+    epsilon = epsilonMap[maxBitwidth]
+    maxPivot = int(2*math.ceil(4.94*(1+1/epsilon)*(1+1/epsilon)))
+    print maxPivot
 
     (constraint, coeffDecl, prime) = generateEquationConstraint(varMap, primesMap, maxBitwidth, slices)
     constraintList.append(constraint)
