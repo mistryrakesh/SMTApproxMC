@@ -256,11 +256,11 @@ def main(argv):
     smt2suffix = parseSmt2FileSuffix(inputSMTFile, "true")
 
     maxBitwidth = max(varMap.values())
-    print "maxBitwidth: " + str(maxBitwidth)
+    # print "maxBitwidth: " + str(maxBitwidth)
 
     # find pivot solutions
     tempDir = os.getcwd() + "/temp_amc"
-    smtSolver = "/home/intelproject/Desktop/boolector/boolector-mc/boolector/boolector"
+    smtSolver = "boolector-mc/boolector/boolector"
 
     tempSMT2FileName = tempDir + "/temp.smt2"
     tempOutputFile = tempDir + "/solverResults.txt"
@@ -280,7 +280,7 @@ def main(argv):
 
     epsilon = epsilonMap[maxBitwidth]
     maxPivot = int(2*math.ceil(4.94*(1+1/epsilon)*(1+1/epsilon)))
-    print maxPivot
+    print "maxPivot: " + str(maxPivot)
 
     (constraint, coeffDecl, prime) = generateEquationConstraint(varMap, primesMap, maxBitwidth, slices)
     constraintList.append(constraint)
@@ -298,13 +298,16 @@ def main(argv):
         os.system(cmd)
         numSolutions = countSolutions(tempOutputFile)
 
-        print "numConstraints: " + str(len(constraintList)) + ", slices: " + str(slices) + ", numSolutions: " + str(numSolutions)
+        # print "numConstraints: " + str(len(constraintList)) + ", slices: " + str(slices) + ", numSolutions: " + str(numSolutions)
         
-        if numSolutions >= minPivot:
+        if numSolutions >= maxPivot:
             (constraint, coeffDecl, prime) = generateEquationConstraint(varMap, primesMap, maxBitwidth, slices)
             constraintList.append(constraint)
             coeffDeclList.append(coeffDecl)
             primeList.append(prime)
+
+        elif numSolutions >= minPivot:
+            break;
 
         elif numSolutions >= 0:
             constraintList.pop()
@@ -323,6 +326,7 @@ def main(argv):
 
         # raw_input("Press Enter to continue...")
 
+    print "numSolutions: " + str(numSolutions)
     print "primeList: " + str(primeList)
 
 if __name__ == "__main__":
