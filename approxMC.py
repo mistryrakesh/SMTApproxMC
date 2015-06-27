@@ -278,7 +278,7 @@ def main(argv):
     timeout = 2500
     minPivot = 1
 
-    epsilon = epsilonMap[maxBitwidth]
+    epsilon = 0.8 # epsilonMap[maxBitwidth]
     maxPivot = int(2*math.ceil(4.94*(1+1/epsilon)*(1+1/epsilon)))
     print "maxPivot: " + str(maxPivot)
 
