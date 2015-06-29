@@ -226,13 +226,37 @@ def generateSMT1FromSMT2File(smt2FileName, smt1FileName):
 def countSolutions(smtResultsFileName):
     smtResultsFile = open(smtResultsFileName, "r")
     count = 0
+    hasTimedOut = False
 
     for line in smtResultsFile:
         if line == "sat\n":
             count += 1
+        elif "[btormain] ALARM TRIGGERED: time limit" in line:
+            hasTimedOut = True
 
-    return count
+    return count, hasTimedOut
 
+
+def getCommonPrimesAndMedian(runResults, logFile):
+    commonPrimes = runResults[0][1]
+    for i in range(1, len(runResults) - 1):
+        commonPrimes = commonPrimes & runResults[i][1]
+
+    logFile.write("commomPrimes: " + str(list(commonPrimes.elements())) + "\n")
+
+    valList = []
+    for i in range(len(runResults)):
+        subResult = runResults[i][1].subtract(commonPrimes)
+        if subResult == None:
+            valList.append(runResults[i][0])
+        else:
+            sum = 0
+            for key in subResult:
+                sum += key * subResult[key]
+            valList.append(sum * runResults[i][0])
+    
+    return (list(commonPrimes.elements()), numpy.median(valList))
+    
 
 # Function: main
 def main(argv):
@@ -269,17 +293,22 @@ def main(argv):
     if not os.path.exists(tempDir):
         os.makedirs(tempDir)
 
-    timeout = 2500
+    timeout = 10
     minPivot = 1
 
     epsilon = 0.8 # epsilonMap[maxBitwidth]
     maxPivot = int(2*math.ceil(4.94*(1+1/epsilon)*(1+1/epsilon)))
     # print("maxPivot: " + str(maxPivot))
+
+    scriptStartTime = os.times()
+    logFile.write("Script start time: " + str(scriptStartTime) + "\n")
+
     logFile.write("Epsilon: " + str(epsilon) + "\n")
     logFile.write("maxPivot: " + str(maxPivot) + "\n")
 
 
     iterationRunResults = []
+    timedOutRuns = set()
     for i in range(numIterations):
         tempSMT2FileName = tempDir + "/temp_" + str(i) + ".smt2"
         tempOutputFile = tempDir + "/solverResults_" + str(i) + ".txt"
@@ -288,6 +317,7 @@ def main(argv):
 
         slices = 2
 
+        logFile.write("\n\n################################################################################\n")
         logFile.write("Iteration: " + str(i) + "\n")
         
         constraintList = []
@@ -299,11 +329,18 @@ def main(argv):
         coeffDeclList.append(coeffDecl)
         primeList.append(prime)
 
+        innerLoopRun = 0
         while True:
+            logFile.write("\n----\n")
+            logFile.write("innerLoopRun: " + str(innerLoopRun) + "\n")
+            innerLoopRun += 1
+
             generateSMT2FileFromConstraints(smt2prefix, coeffDeclList, constraintList, smt2suffix, tempSMT2FileName)
             conversionResult = generateSMT1FromSMT2File(tempSMT2FileName, tempSMT1FileName)
             if conversionResult != 0:
                 sys.stderr.write("Error while converting from SMT2 File to SMT1 file. Aborting ...\n")
+                logFile.write("Error while converting from SMT2 File to SMT1 file. Aborting ...\n")
+                logFile.close()
                 exit(1)
 
             cmd = smtSolver + " -i -m -t " + str(timeout) + " --maxsolutions=" + str(maxPivot) + " " + tempSMT1FileName + " >" + tempOutputFile + " 2>>" + tempErrorFile;
@@ -312,13 +349,18 @@ def main(argv):
             startTime = os.times()
             os.system(cmd)
             endTime = os.times()
+
             logFile.write("startTime: " + str(startTime) + "\n")
             logFile.write("endTime: " + str(endTime) + "\n")
             logFile.write("cmd time: " + str(endTime.children_user + endTime.children_system - startTime.children_user - startTime.children_system) + "\n")
 
-            numSolutions = countSolutions(tempOutputFile)
+            hasTimedOut = False
+            (numSolutions, hasTimedOut) = countSolutions(tempOutputFile)
 
-            logFile.write("numConstraints: " + str(len(constraintList)) + ", slices: " + str(slices) + ", numSolutions: " + str(numSolutions) + "\n")
+            if hasTimedOut:
+                timedOutRuns.add(i)
+
+            logFile.write("numConstraints: " + str(len(constraintList)) + ", slices: " + str(slices) + ", numSolutions: " + str(numSolutions) + ", hasTimedOut: " + str(hasTimedOut) + "\n")
         
             if numSolutions >= maxPivot:
                 (constraint, coeffDecl, prime) = generateEquationConstraint(varMap, primesMap, maxBitwidth, slices)
@@ -326,7 +368,7 @@ def main(argv):
                 coeffDeclList.append(coeffDecl)
                 primeList.append(prime)
 
-            elif numSolutions >= minPivot:
+            elif numSolutions >= minPivot and not hasTimedOut:
                 break;
 
             elif numSolutions >= 0:
@@ -348,40 +390,28 @@ def main(argv):
 
         iterationRunResults.append((numSolutions, collections.Counter(primeList)))
 
+    scriptEndTime = os.times()
+    logFile.write("Script end time: " + str(scriptEndTime) + "\n")
+    logFile.write("Total script time: " + str(scriptEndTime.children_user + scriptEndTime.children_system - scriptStartTime.children_user - scriptStartTime.children_system) + "\n")
 
     logFile.write("iterationRunResults: " + str(iterationRunResults) + "\n")
 
     (commonPrimes, med) = getCommonPrimesAndMedian(iterationRunResults, logFile)
-    logFile.write("commonPrimes: " + str(commonPrimes) + ", median: " + str(med) + "\n")
-    logFile.close()
+    logFile.write("commonPrimes: " + str(commonPrimes) + ", median: " + str(med) + ", ")
 
+    finalOutputFile.write(str(maxBitwidth) + ", ")
     for primes in commonPrimes:
         finalOutputFile.write(str(primes) + ",")
     finalOutputFile.write(str(med))
 
+    finalOutputFile.write(str(scriptEndTime.children_user + scriptEndTime.children_system - scriptStartTime.children_user - scriptStartTime.children_system) + "\n")
+    if len(timedOutRuns) > 0:
+        logFile.write("Timedout in runs: " + str(timedOutRuns))
+        finalOutputFile.write("Timedout in runs: " + str(timedOutRuns))
+
     finalOutputFile.close()
+    logFile.close()
 
-
-def getCommonPrimesAndMedian(runResults, logFile):
-    commonPrimes = runResults[0][1]
-    for i in range(1, len(runResults) - 1):
-        commonPrimes = commonPrimes & runResults[i][1]
-
-    logFile.write("commomPrimes: " + str(list(commonPrimes.elements())) + "\n")
-
-    valList = []
-    for i in range(len(runResults)):
-        subResult = runResults[i][1].subtract(commonPrimes)
-        if subResult == None:
-            valList.append(0)
-        else:
-            sum = 0
-            for key in subResult:
-                sum += key * subResult[key]
-            valList.append(sum * runResults[i][0])
-    
-    return (list(commonPrimes.elements()), numpy.median(valList))
-    
 
 if __name__ == "__main__":
     main(sys.argv)
