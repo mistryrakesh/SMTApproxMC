@@ -273,8 +273,8 @@ def main(argv):
     inputSMTFile = open(argv[1], "r")
     primesFile = open(argv[2], "r")
     numIterations = int(argv[3])
-    logFile = open(argv[4], "w")
-    finalOutputFile = open(argv[5], "w")
+    logFile = open(argv[4], "w", 1)
+    finalOutputFile = open(argv[5], "w", 1)
     # probMapFile = open(argv[3], "r")
 
     primesMap = populatePrimesMap(primesFile)
@@ -293,7 +293,7 @@ def main(argv):
     if not os.path.exists(tempDir):
         os.makedirs(tempDir)
 
-    timeout = 10
+    timeout = 3000
     minPivot = 1
 
     epsilon = 0.8 # epsilonMap[maxBitwidth]
@@ -386,6 +386,7 @@ def main(argv):
                 coeffDeclList.append(coeffDecl)
                 primeList.append(prime)
 
+            logFile.flush()
             # raw_input("Press Enter to continue...")
 
         iterationRunResults.append((numSolutions, collections.Counter(primeList)))
@@ -399,10 +400,10 @@ def main(argv):
     (commonPrimes, med) = getCommonPrimesAndMedian(iterationRunResults, logFile)
     logFile.write("commonPrimes: " + str(commonPrimes) + ", median: " + str(med) + ", ")
 
-    finalOutputFile.write(str(maxBitwidth) + ", ")
+    finalOutputFile.write(str(maxBitwidth) + ",")
     for primes in commonPrimes:
         finalOutputFile.write(str(primes) + ",")
-    finalOutputFile.write(str(med))
+    finalOutputFile.write(str(med) + ",")
 
     finalOutputFile.write(str(scriptEndTime.children_user + scriptEndTime.children_system - scriptStartTime.children_user - scriptStartTime.children_system) + "\n")
     if len(timedOutRuns) > 0:
