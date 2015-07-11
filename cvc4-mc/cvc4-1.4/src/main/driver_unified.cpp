@@ -282,6 +282,7 @@ int runCvc4(int argc, char* argv[], Options& opts) {
       if(!opts.wasSetByUser(options::incrementalSolving)) {
         cmd = new SetOptionCommand("incremental", true);
         cmd->setMuted(true);
+        cout << "[rakesh] file: " << __FILE__ << ", line: " << __LINE__ << endl;
         pExecutor->doCommand(cmd);
         delete cmd;
       }
@@ -425,6 +426,25 @@ int runCvc4(int argc, char* argv[], Options& opts) {
         }
         delete cmd;
       }
+      
+      /* rakesh - 2015-07-12 - model counting loop.
+       * 
+       * Currently the problem is getting the model out here and create an
+       * Expr of out of it.
+       * 
+       * pExecutor->doCommand(cmd) internally creates GetModelCommand() object,
+       * which prints the model. This code is deeply nested, and we are finding
+       * it difficult to get the model out here.
+       */
+      bool newStatus = false;
+      for (int i = 0; i < 1; ++i) {
+        Expr *e = new Expr(); // [TODO] instead of new Expr() we have to create a constraint out of the previous model
+        Command *newCmd = new AssertCommand(*e);
+        newStatus = pExecutor->doCommand(newCmd);
+        newCmd = new CheckSatCommand();
+        newStatus = pExecutor->doCommand(newCmd); // this internally calls a command 'get-model' which prints the model
+      }
+
       // Remove the parser
       delete parser;
     }
