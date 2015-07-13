@@ -282,7 +282,6 @@ int runCvc4(int argc, char* argv[], Options& opts) {
       if(!opts.wasSetByUser(options::incrementalSolving)) {
         cmd = new SetOptionCommand("incremental", true);
         cmd->setMuted(true);
-        cout << "[rakesh] file: " << __FILE__ << ", line: " << __LINE__ << endl;
         pExecutor->doCommand(cmd);
         delete cmd;
       }
@@ -427,22 +426,37 @@ int runCvc4(int argc, char* argv[], Options& opts) {
         delete cmd;
       }
       
-      /* rakesh - 2015-07-12 - model counting loop.
-       * 
-       * Currently the problem is getting the model out here and create an
-       * Expr of out of it.
-       * 
-       * pExecutor->doCommand(cmd) internally creates GetModelCommand() object,
-       * which prints the model. This code is deeply nested, and we are finding
-       * it difficult to get the model out here.
-       */
+      /* rakesh - 2015-07-12 - model counting loop */
       bool newStatus = false;
-      for (int i = 0; i < 1; ++i) {
-        Expr *e = new Expr(); // [TODO] instead of new Expr() we have to create a constraint out of the previous model
-        Command *newCmd = new AssertCommand(*e);
+      for (int i = 0; i < 2; ++i) {
+        // we have to create a constraint out of the previous model
+//        Type bitvector32 = parser->getExprManager()->mkBitVectorType(32);
+//        Expr x = parser->getExprManager()->mkVar("x", bitvector32);
+//        Expr y = parser->getExprManager()->mkVar("y", bitvector32);
+//        Expr x_eq_y = parser->getExprManager()->mkExpr(kind::EQUAL, x, y);
+//
+//        Command *newCmd = new AssertCommand(x_eq_y);
+//        newStatus = pExecutor->doCommand(newCmd);
+//        delete newCmd;
+
+        std::cout << "New commands below" << std::endl;
+        Command *newCmd = new CheckSatCommand();
+        // newStatus = pExecutor->doCommand(newCmd); // this internally calls a command 'get-model' which prints the model
+        // newStatus = pExecutor->doCheckSatCommandSingleton(newCmd);
+        newCmd->invoke(pExecutor->getSmtEngine(), std::cout);
+        delete newCmd;
+
+        GetModelCommand *getModelCmd = new GetModelCommand();
+        Expr constraint = getModelCmd->getModelCommandInvoke(pExecutor->getSmtEngine(), std::cout);
+        delete getModelCmd;
+
+        newCmd = new AssertCommand(constraint);
         newStatus = pExecutor->doCommand(newCmd);
-        newCmd = new CheckSatCommand();
-        newStatus = pExecutor->doCommand(newCmd); // this internally calls a command 'get-model' which prints the model
+        delete newCmd;
+
+        std::cout << "[" << __FILE__ << ":" << __LINE__ << "] newStatus: " << newStatus << std::endl;
+        Result newResult = pExecutor->getResult();
+        std::cout << "[" << __FILE__ << ":" << __LINE__ << "] newResult: " << newResult.toString() << std::endl;
       }
 
       // Remove the parser
@@ -497,7 +511,7 @@ int runCvc4(int argc, char* argv[], Options& opts) {
     // make sure out and err streams are flushed too
     *opts[options::out] << flush;
     *opts[options::err] << flush;
- 
+
 #ifdef CVC4_DEBUG
     if(opts[options::earlyExit] && opts.wasSetByUser(options::earlyExit)) {
       _exit(returnValue);

@@ -995,6 +995,36 @@ void GetModelCommand::invoke(SmtEngine* smtEngine) throw() {
   }
 }
 
+/* rakesh - 2015-07-13 */
+Expr GetModelCommand::getModelCommandInvoke(SmtEngine* smtEngine, std::ostream& out) throw() {
+  invoke(smtEngine);
+
+  Expr constraint = smtEngine->getExprManager()->mkConst(true);
+  if(!(isMuted() && ok())) {
+    // printResult(out, smtEngine->getOption("command-verbosity:" + getCommandName()).getIntegerValue().toUnsignedInt());
+    // out << *d_result; // this works
+    std::cout << "[" << __FILE__ << ":" << __LINE__ << "] : getCommandName(): " << getCommandName() << std::endl;
+
+    for(size_t i = 0; i < d_result->getNumCommands(); ++i) {
+      const Command *c = d_result->getCommand(i);
+
+      if(dynamic_cast<const DeclareFunctionCommand*>(c) != NULL) {
+        const DeclareFunctionCommand* dfc = (const DeclareFunctionCommand*)c;
+        Expr expr = dfc->getFunction();
+        Expr val = smtEngine->getValue(expr);
+
+        Expr exprEqualVal = smtEngine->getExprManager()->mkExpr(kind::EQUAL, expr, val);
+        constraint = smtEngine->getExprManager()->mkExpr(kind::AND, constraint, exprEqualVal);
+        std::cout << "expr: " << expr.toString() << ", value: " << val.toString() << std::endl;
+      }
+    }
+
+    constraint = smtEngine->getExprManager()->mkExpr(kind::NOT, constraint);
+  }
+
+  return constraint;
+}
+
 /* Model is private to the library -- for now
 Model* GetModelCommand::getResult() const throw() {
   return d_result;

@@ -798,7 +798,6 @@ void Smt2Printer::toStream(std::ostream& out, const Model& m, const Command* c) 
         if( tm.d_rep_set.d_type_reps.find( tn )!=tm.d_rep_set.d_type_reps.end() ){
           for( size_t i=0; i<(*tm.d_rep_set.d_type_reps.find(tn)).second.size(); i++ ){
             if( (*tm.d_rep_set.d_type_reps.find(tn)).second[i].isVar() ){
-              out << ";  line: " << __LINE__ << "\n"; // added by rakesh
               out << "(declare-fun " << quoteSymbol((*tm.d_rep_set.d_type_reps.find(tn)).second[i]) << " () " << tn << ")" << endl;
             }else{
               out << "; rep: " << (*tm.d_rep_set.d_type_reps.find(tn)).second[i] << endl;
@@ -820,7 +819,6 @@ void Smt2Printer::toStream(std::ostream& out, const Model& m, const Command* c) 
     }
     Node val = Node::fromExpr(tm.getSmtEngine()->getValue(n.toExpr()));
     if(val.getKind() == kind::LAMBDA) {
-      out << ";  line: " << __LINE__ << "\n"; // added by rakesh
       out << "(define-fun " << n << " " << val[0]
           << " " << n.getType().getRangeType()
           << " " << val[1] << ")" << endl;
@@ -832,11 +830,8 @@ void Smt2Printer::toStream(std::ostream& out, const Model& m, const Command* c) 
           val = theory::arrays::TheoryArraysRewriter::normalizeConstant( val, indexCard );
         }
       }
-      out << ";  line: " << __LINE__ << "\n"; // added by rakesh [this gets called]
       out << "(define-fun " << n << " () "
-          << n.getType() << " " << val << ")" << endl;
-      
-      Node nodeToValue = NodeManager::currentNM()->mkNode(kind::EQUAL, n, val);
+          << n.getType() << " " << val << ")" << endl;      
     }
 /*
     //for table format (work in progress)
@@ -948,7 +943,6 @@ static void toStream(std::ostream& out, const DeclareFunctionCommand* c) throw()
 static void toStream(std::ostream& out, const DefineFunctionCommand* c) throw() {
   Expr func = c->getFunction();
   const vector<Expr>* formals = &c->getFormals();
-  out << ";  line: " << __LINE__ << "\n"; // added by rakesh
   out << "(define-fun " << func << " (";
   Type type = func.getType();
   Expr formula = c->getFormula();

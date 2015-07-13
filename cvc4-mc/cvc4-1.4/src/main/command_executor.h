@@ -72,6 +72,9 @@ protected:
 private:
   CommandExecutor();
 
+public:
+  bool doCheckSatCommandSingleton(Command* cmd); // rakesh - 2015-07-13
+
 };/* class CommandExecutor */
 
 bool smtEngineInvoke(SmtEngine* smt,
