@@ -995,16 +995,12 @@ void GetModelCommand::invoke(SmtEngine* smtEngine) throw() {
   }
 }
 
-/* rakesh - 2015-07-13 */
+/* rakesh - 2015-07-13 - Added function to return new constraint for model counting */
 Expr GetModelCommand::getModelCommandInvoke(SmtEngine* smtEngine, std::ostream& out) throw() {
   invoke(smtEngine);
 
   Expr constraint = smtEngine->getExprManager()->mkConst(true);
   if(!(isMuted() && ok())) {
-    // printResult(out, smtEngine->getOption("command-verbosity:" + getCommandName()).getIntegerValue().toUnsignedInt());
-    // out << *d_result; // this works
-    std::cout << "[" << __FILE__ << ":" << __LINE__ << "] : getCommandName(): " << getCommandName() << std::endl;
-
     for(size_t i = 0; i < d_result->getNumCommands(); ++i) {
       const Command *c = d_result->getCommand(i);
 
@@ -1015,7 +1011,6 @@ Expr GetModelCommand::getModelCommandInvoke(SmtEngine* smtEngine, std::ostream& 
 
         Expr exprEqualVal = smtEngine->getExprManager()->mkExpr(kind::EQUAL, expr, val);
         constraint = smtEngine->getExprManager()->mkExpr(kind::AND, constraint, exprEqualVal);
-        std::cout << "expr: " << expr.toString() << ", value: " << val.toString() << std::endl;
       }
     }
 

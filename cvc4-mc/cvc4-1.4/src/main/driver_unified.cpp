@@ -418,6 +418,13 @@ int runCvc4(int argc, char* argv[], Options& opts) {
         replayParser->useDeclarationsFrom(parser);
       }
       while((status || opts[options::continuedExecution]) && (cmd = parser->nextCommand())) {
+
+        // rakesh - 2015-07-13 - stop at 'check-sat' command and do model counting below
+        if (dynamic_cast<CheckSatCommand*>(cmd) != NULL) {
+          delete cmd;
+          break;
+        }
+
         status = pExecutor->doCommand(cmd);
         if(dynamic_cast<QuitCommand*>(cmd) != NULL) {
           delete cmd;
@@ -425,26 +432,19 @@ int runCvc4(int argc, char* argv[], Options& opts) {
         }
         delete cmd;
       }
-      
-      /* rakesh - 2015-07-12 - model counting loop */
-      bool newStatus = false;
-      for (int i = 0; i < 2; ++i) {
-        // we have to create a constraint out of the previous model
-//        Type bitvector32 = parser->getExprManager()->mkBitVectorType(32);
-//        Expr x = parser->getExprManager()->mkVar("x", bitvector32);
-//        Expr y = parser->getExprManager()->mkVar("y", bitvector32);
-//        Expr x_eq_y = parser->getExprManager()->mkExpr(kind::EQUAL, x, y);
-//
-//        Command *newCmd = new AssertCommand(x_eq_y);
-//        newStatus = pExecutor->doCommand(newCmd);
-//        delete newCmd;
 
-        std::cout << "New commands below" << std::endl;
+      /* rakesh - 2015-07-12 - model counting loop */
+      bool newStatus = true;
+      for (int i = 0; i < 5; ++i) {
         Command *newCmd = new CheckSatCommand();
-        // newStatus = pExecutor->doCommand(newCmd); // this internally calls a command 'get-model' which prints the model
-        // newStatus = pExecutor->doCheckSatCommandSingleton(newCmd);
         newCmd->invoke(pExecutor->getSmtEngine(), std::cout);
+        newStatus = !newCmd->fail();
+        Result newResult = dynamic_cast<CheckSatCommand*>(newCmd)->getResult();
         delete newCmd;
+
+        std::cout << "newStatus: " << newStatus << ", newResult: " << newResult.toString() << std::endl;
+        if (!newResult.isSat() || newResult.isUnknown())
+          break;
 
         GetModelCommand *getModelCmd = new GetModelCommand();
         Expr constraint = getModelCmd->getModelCommandInvoke(pExecutor->getSmtEngine(), std::cout);
@@ -452,11 +452,8 @@ int runCvc4(int argc, char* argv[], Options& opts) {
 
         newCmd = new AssertCommand(constraint);
         newStatus = pExecutor->doCommand(newCmd);
+        std::cout << "AssertCommand Result: " << pExecutor->getResult().toString() << std::endl;
         delete newCmd;
-
-        std::cout << "[" << __FILE__ << ":" << __LINE__ << "] newStatus: " << newStatus << std::endl;
-        Result newResult = pExecutor->getResult();
-        std::cout << "[" << __FILE__ << ":" << __LINE__ << "] newResult: " << newResult.toString() << std::endl;
       }
 
       // Remove the parser
