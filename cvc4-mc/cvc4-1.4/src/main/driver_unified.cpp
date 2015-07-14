@@ -442,7 +442,6 @@ int runCvc4(int argc, char* argv[], Options& opts) {
         Result newResult = dynamic_cast<CheckSatCommand*>(newCmd)->getResult();
         delete newCmd;
 
-        std::cout << "newStatus: " << newStatus << ", newResult: " << newResult.toString() << std::endl;
         if (!newResult.isSat() || newResult.isUnknown())
           break;
 
@@ -452,7 +451,6 @@ int runCvc4(int argc, char* argv[], Options& opts) {
 
         newCmd = new AssertCommand(constraint);
         newStatus = pExecutor->doCommand(newCmd);
-        std::cout << "AssertCommand Result: " << pExecutor->getResult().toString() << std::endl;
         delete newCmd;
       }
 
