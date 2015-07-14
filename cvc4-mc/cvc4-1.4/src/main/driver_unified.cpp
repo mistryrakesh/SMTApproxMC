@@ -434,8 +434,9 @@ int runCvc4(int argc, char* argv[], Options& opts) {
       }
 
       /* rakesh - 2015-07-12 - model counting loop */
+      unsigned int maxSolutions = opts[options::maxsolutions];
       bool newStatus = true;
-      for (int i = 0; i < 5; ++i) {
+      for (int i = 0; i < maxSolutions; ++i) {
         Command *newCmd = new CheckSatCommand();
         newCmd->invoke(pExecutor->getSmtEngine(), std::cout);
         newStatus = !newCmd->fail();
