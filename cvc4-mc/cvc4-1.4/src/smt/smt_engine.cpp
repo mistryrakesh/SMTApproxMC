@@ -948,7 +948,7 @@ void SmtEngine::setDefaults() {
   }
 
   // If in arrays, set the UF handler to arrays
-  if(d_logic.isTheoryEnabled(THEORY_ARRAY) && ( !d_logic.isQuantified() || 
+  if(d_logic.isTheoryEnabled(THEORY_ARRAY) && ( !d_logic.isQuantified() ||
      (d_logic.isQuantified() && !d_logic.isTheoryEnabled(THEORY_UF)))) {
     Theory::setUninterpretedSortOwner(THEORY_ARRAY);
   } else {
@@ -1054,15 +1054,15 @@ void SmtEngine::setDefaults() {
   }
 
 
-  if (options::bitblastMode() == theory::bv::BITBLAST_MODE_EAGER &&
-      options::incrementalSolving()) {
-    if (options::incrementalSolving.wasSetByUser()) {
-      throw OptionException(std::string("Eager bit-blasting does not currently support incremental mode. \n\
-                                         Try --bitblast=lazy"));
-    }
-    Notice() << "SmtEngine: turning off incremental to support eager bit-blasting" << endl;
-    setOption("incremental", SExpr("false"));
-  }
+//  if (options::bitblastMode() == theory::bv::BITBLAST_MODE_EAGER &&
+//      options::incrementalSolving()) {
+//    if (options::incrementalSolving.wasSetByUser()) {
+//      throw OptionException(std::string("Eager bit-blasting does not currently support incremental mode. \n\
+//                                         Try --bitblast=lazy"));
+//    }
+//    Notice() << "SmtEngine: turning off incremental to support eager bit-blasting" << endl;
+//    setOption("incremental", SExpr("false"));
+//  }
 
   if (! options::bvEagerExplanations.wasSetByUser() &&
       d_logic.isTheoryEnabled(THEORY_ARRAY) &&

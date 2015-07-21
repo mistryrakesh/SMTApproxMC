@@ -74,7 +74,7 @@ inline BitblastMode stringToBitblastMode(std::string option, std::string optarg,
         options::bitvectorEqualitySlicer.set(BITVECTOR_SLICER_AUTO);
       }
     }
-    
+
     if (!options::bitvectorInequalitySolver.wasSetByUser()) {
       options::bitvectorInequalitySolver.set(true);
     }
@@ -84,12 +84,12 @@ inline BitblastMode stringToBitblastMode(std::string option, std::string optarg,
     return BITBLAST_MODE_LAZY;
   } else if(optarg == "eager") {
 
-    if (options::incrementalSolving() &&
-        options::incrementalSolving.wasSetByUser()) {
-      throw OptionException(std::string("Eager bit-blasting does not currently support incremental mode. \n\
-                                         Try --bitblast=lazy"));
-    }
-    
+//    if (options::incrementalSolving() &&
+//        options::incrementalSolving.wasSetByUser()) {
+//      throw OptionException(std::string("Eager bit-blasting does not currently support incremental mode. \n\
+//                                         Try --bitblast=lazy"));
+//    }
+
     if (!options::bitvectorToBool.wasSetByUser()) {
       options::bitvectorToBool.set(true);
     }
@@ -97,7 +97,7 @@ inline BitblastMode stringToBitblastMode(std::string option, std::string optarg,
     if (!options::bvAbstraction.wasSetByUser() &&
         !options::skolemizeArguments.wasSetByUser()) {
       options::bvAbstraction.set(true);
-      options::skolemizeArguments.set(true); 
+      options::skolemizeArguments.set(true);
     }
     return BITBLAST_MODE_EAGER;
   } else if(optarg == "help") {
@@ -129,7 +129,7 @@ inline BvSlicerMode stringToBvSlicerMode(std::string option, std::string optarg,
   } else if(optarg == "on") {
     return BITVECTOR_SLICER_ON;
   } else if(optarg == "off") {
-    return BITVECTOR_SLICER_OFF; 
+    return BITVECTOR_SLICER_OFF;
   } else if(optarg == "help") {
     puts(bitblastingModeHelp.c_str());
     exit(1);
