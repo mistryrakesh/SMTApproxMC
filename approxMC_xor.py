@@ -154,6 +154,17 @@ def countSolutions(smtResultsFileName):
     return count, hasTimedOut
 
 
+# Function: getCommonIterationsAndMedian
+def getCommonIterationsAndMedian(iterationRunResults):
+    commonIterations = min([i[0] for i in iterationRunResults])
+
+    valList = []
+    for (numIterations, numSolutions) in iterationRunResults:
+        valList.append(2 ** (numIterations - commonIterations) * numSolutions)
+
+    return (commonIterations, numpy.median(valList))
+
+
 # Function: main
 def main(argv):
     # check for correct number of arguments
@@ -192,7 +203,6 @@ def main(argv):
     logFile.write("Epsilon: " + str(epsilon) + "\n")
     logFile.write("maxPivot: " + str(maxPivot) + "\n")
 
-
     iterationRunResults = []
     timedOutRuns = set()
     for i in range(numIterations):
@@ -207,6 +217,7 @@ def main(argv):
         constraintList = []
         innerLoopRun = 0
         hasTimedOut = False
+        numSolutions = 0
 
         while True:
             logFile.write("\n----\n")
@@ -246,10 +257,10 @@ def main(argv):
             logFile.flush()
             # raw_input("Press Enter to continue...")
 
-        iterationRunResults.append(len(constraintList))
+        iterationRunResults.append((len(constraintList), numSolutions))
 
         if hasTimedOut:
-            timedOutRuns.append(i)
+            timedOutRuns.add(i)
 
 
     scriptEndTime = os.times()
@@ -258,13 +269,16 @@ def main(argv):
 
     logFile.write("iterationRunResults: " + str(iterationRunResults) + "\n")
 
-    for num in iterationRunResults:
-        finalOutputFile.write(str(num) + ", ")
+    (commonIterations, median) = getCommonIterationsAndMedian(iterationRunResults)
 
-    finalOutputFile.write(str(scriptEndTime.children_user + scriptEndTime.children_system - scriptStartTime.children_user - scriptStartTime.children_system))
-    if len(timedOutRuns) > 0:
-        logFile.write("Timedout in runs: " + str(timedOutRuns))
-        finalOutputFile.write(", Timedout in runs: " + str(timedOutRuns))
+    finalOutputFile.write(str(commonIterations) + ";")
+    finalOutputFile.write(str(median) + ";")
+
+    finalOutputFile.write(str(scriptEndTime.children_user + scriptEndTime.children_system - scriptStartTime.children_user - scriptStartTime.children_system) + ";")
+
+    logFile.write("Timedout in runs: " + str(timedOutRuns))
+    finalOutputFile.write(str(len(timedOutRuns)) + ";")
+    finalOutputFile.write("Timedout in runs: " + str(timedOutRuns))
 
     finalOutputFile.close()
     logFile.close()

@@ -239,22 +239,24 @@ def countSolutions(smtResultsFileName):
 
 def getCommonPrimesAndMedian(runResults, logFile):
     commonPrimes = runResults[0][1]
-    for i in range(1, len(runResults) - 1):
+    for i in range(1, len(runResults)):
         commonPrimes = commonPrimes & runResults[i][1]
 
     logFile.write("commomPrimes: " + str(list(commonPrimes.elements())) + "\n")
 
     valList = []
     for i in range(len(runResults)):
-        subResult = runResults[i][1].subtract(commonPrimes)
+        # subResult = runResults[i][1].subtract(commonPrimes)
+        subResult = runResults[i][1] - commonPrimes
         if subResult == None:
             valList.append(runResults[i][0])
         else:
-            sum = 0
+            prod = 1
             for key in subResult:
-                sum += key * subResult[key]
-            valList.append(sum * runResults[i][0])
-    
+                prod = prod * (key ** subResult[key])
+            valList.append(prod * runResults[i][0])
+
+    logFile.write("valList: " + str(valList) + "\n")
     return (list(commonPrimes.elements()), numpy.median(valList))
     
 
@@ -337,7 +339,7 @@ def main(argv):
 
             generateSMT2FileFromConstraints(smt2prefix, coeffDeclList, constraintList, smt2suffix, tempSMT2FileName)
 
-            cmd = smtSolver + " -im --tlimit=" + str(timeout * 1000) + " --maxsolutions=" + str(maxPivot) + " " + tempSMT2FileName + " >" + tempOutputFile + " 2>>" + tempErrorFile;
+            cmd = smtSolver + " -im --tlimit=" + str(timeout * 1000) + " --maxsolutions=" + str(maxPivot) + " --bitblast=eager " + tempSMT2FileName + " >" + tempOutputFile + " 2>>" + tempErrorFile;
             logFile.write("cmd: " + cmd + "\n")
             
             startTime = os.times()
@@ -401,9 +403,9 @@ def main(argv):
 
     finalOutputFile.write(str(scriptEndTime.children_user + scriptEndTime.children_system - scriptStartTime.children_user - scriptStartTime.children_system) + ";")
     finalOutputFile.write(str(len(timedOutRuns)) + ";")
-    if len(timedOutRuns) > 0:
-        logFile.write("Timedout in runs: " + str(timedOutRuns))
-        finalOutputFile.write("Timedout in runs: " + str(timedOutRuns))
+
+    logFile.write("Timedout in runs: " + str(timedOutRuns) + ";")
+    finalOutputFile.write("Timedout in runs: " + str(timedOutRuns))
 
     finalOutputFile.close()
     logFile.close()
