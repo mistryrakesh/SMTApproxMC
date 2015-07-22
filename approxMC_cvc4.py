@@ -73,6 +73,17 @@ def populateEpsilonMap(probFile):
     return epsilonMap
 
 
+#Function: computeNewBitwidth
+def computeNewBitwidth(k, slices, varMap):
+    totalBitwidth = 0
+    for key in varMap.keys():
+        totalBitwidth += math.ceil(float(varMap[key]) / k)
+    
+    newBitwidth = k + int(math.ceil(math.log(slices * totalBitwidth, 2))) + 1 # +1 since 's' can be upto 'prime-1'
+
+    return newBitwidth
+
+
 # Function: generateEquationConstraint
 # @param: varmap - a map of variables with key as variable name and value being
 #         its width
@@ -89,13 +100,14 @@ def generateEquationConstraint(varMap, primesMap, maxBitwidth, slices):
     twoPowerK = 2 ** k
     prime = primesMap[k]
 
-    newBitwidth = k + int(math.ceil(math.log(slices * len(varMap), 2))) + 1 # +1 since 's' can be upto 'prime-1'
+    newBitwidth = computeNewBitwidth(k, slices, varMap)
 
     primeCoeff = "temp_prime_coeff_" + str(generateEquationConstraint.counter)
     primeCoeffDecl = "(declare-fun " + primeCoeff + " () (_ BitVec " + str(newBitwidth - (k + 1)) + "))\n"
 
     bvmulList = []
     for key in varMap.keys():
+        originalKey = key
         if varMap[key] != maxBitwidth:
             key = zeroExtendExpr(maxBitwidth - varMap[key], key)
 
@@ -117,16 +129,20 @@ def generateEquationConstraint(varMap, primesMap, maxBitwidth, slices):
 
         keyDivs = []
         msbPos = maxBitwidth - 1
+        remSlices = 0
         for i in range(slices):
-            keyDivs.append(extractExpr(msbPos, msbPos - keyDivWidthList[i] + 1, key))
+            lsbPos = msbPos - keyDivWidthList[i] + 1
+            if lsbPos < varMap[originalKey]:
+                keyDivs.append(extractExpr(msbPos, lsbPos, key))
+                remSlices += 1
             msbPos = msbPos - keyDivWidthList[i]
 
         zxtndKeyDivs = []
-        for i in range(slices):
+        for i in range(remSlices):
             zxtndKeyDivs.append(zeroExtendExpr(newBitwidth - keyDivWidthList[i], keyDivs[i]))
 
         bvmulStrs = []
-        for i in range(slices):
+        for i in range(remSlices):
             bvmulList.append(bvmulExpr(constExpr(coeff[i], newBitwidth), zxtndKeyDivs[i]))
 
 
@@ -266,7 +282,7 @@ def main(argv):
 
     # check for correct number of arguments
     scriptName = os.path.basename(__file__)
-    if len(argv) < 5:
+    if len(argv) < 6:
         sys.stderr.write("Error: Invalid arguments.\n")
         sys.stderr.write("    [Usage]: " + scriptName + " <input_SMT2_file> <primes_file> <num_iterations> <log_file> <output_file>\n")
         sys.exit(1)
