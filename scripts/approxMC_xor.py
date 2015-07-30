@@ -234,7 +234,7 @@ def main(argv):
                 logFile.close()
                 exit(1)
 
-            cmd = smtSolver + " -i -m -t " + str(timeout) + " --maxsolutions=" + str(maxPivot) + " " + tempSMT1FileName + " >" + tempOutputFile + " 2>>" + tempErrorFile;
+            cmd = smtSolver + " -i -m -t " + str(timeout) + " --maxsolutions=" + str(maxPivot) + " " + tempSMT1FileName + " >" + tempOutputFile + " 2>>" + tempErrorFile
             logFile.write("cmd: " + cmd + "\n")
             
             startTime = os.times()

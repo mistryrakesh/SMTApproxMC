@@ -73,6 +73,17 @@ def populateEpsilonMap(probFile):
     return epsilonMap
 
 
+# Function: computeNewBitwidth
+def computeNewBitwidth(k, slices, varMap):
+    totalBitwidth = 0
+    for key in varMap.keys():
+        totalBitwidth += math.ceil(float(varMap[key]) / k)
+    
+    newBitwidth = k + int(math.ceil(math.log(slices * totalBitwidth, 2))) + 1 # +1 since 's' can be upto 'prime-1'
+
+    return newBitwidth
+
+
 # Function: generateEquationConstraint
 # @param: varmap - a map of variables with key as variable name and value being
 #         its width
@@ -89,13 +100,14 @@ def generateEquationConstraint(varMap, primesMap, maxBitwidth, slices):
     twoPowerK = 2 ** k
     prime = primesMap[k]
 
-    newBitwidth = k + int(math.ceil(math.log(slices * len(varMap), 2))) + 1 # +1 since 's' can be upto 'prime-1'
+    newBitwidth = computeNewBitwidth(k, slices, varMap)
 
     primeCoeff = "temp_prime_coeff_" + str(generateEquationConstraint.counter)
     primeCoeffDecl = "(declare-fun " + primeCoeff + " () (_ BitVec " + str(newBitwidth - (k + 1)) + "))\n"
 
     bvmulList = []
     for key in varMap.keys():
+        originalKey = key
         if varMap[key] != maxBitwidth:
             key = zeroExtendExpr(maxBitwidth - varMap[key], key)
 
@@ -117,16 +129,20 @@ def generateEquationConstraint(varMap, primesMap, maxBitwidth, slices):
 
         keyDivs = []
         msbPos = maxBitwidth - 1
+        remSlices = 0
         for i in range(slices):
-            keyDivs.append(extractExpr(msbPos, msbPos - keyDivWidthList[i] + 1, key))
+            lsbPos = msbPos - keyDivWidthList[i] + 1
+            if lsbPos < varMap[originalKey]:
+                keyDivs.append(extractExpr(msbPos, lsbPos, key))
+                remSlices += 1
             msbPos = msbPos - keyDivWidthList[i]
 
         zxtndKeyDivs = []
-        for i in range(slices):
+        for i in range(remSlices):
             zxtndKeyDivs.append(zeroExtendExpr(newBitwidth - keyDivWidthList[i], keyDivs[i]))
 
         bvmulStrs = []
-        for i in range(slices):
+        for i in range(remSlices):
             bvmulList.append(bvmulExpr(constExpr(coeff[i], newBitwidth), zxtndKeyDivs[i]))
 
 
@@ -239,22 +255,24 @@ def countSolutions(smtResultsFileName):
 
 def getCommonPrimesAndMedian(runResults, logFile):
     commonPrimes = runResults[0][1]
-    for i in range(1, len(runResults) - 1):
+    for i in range(1, len(runResults)):
         commonPrimes = commonPrimes & runResults[i][1]
 
     logFile.write("commomPrimes: " + str(list(commonPrimes.elements())) + "\n")
 
     valList = []
     for i in range(len(runResults)):
-        subResult = runResults[i][1].subtract(commonPrimes)
+        # subResult = runResults[i][1].subtract(commonPrimes)
+        subResult = runResults[i][1] - commonPrimes
         if subResult == None:
             valList.append(runResults[i][0])
         else:
-            sum = 0
+            prod = 1
             for key in subResult:
-                sum += key * subResult[key]
-            valList.append(sum * runResults[i][0])
-    
+                prod = prod * (key ** subResult[key])
+            valList.append(prod * runResults[i][0])
+
+    logFile.write("valList: " + str(valList) + "\n")
     return (list(commonPrimes.elements()), numpy.median(valList))
     
 
@@ -264,7 +282,7 @@ def main(argv):
 
     # check for correct number of arguments
     scriptName = os.path.basename(__file__)
-    if len(argv) < 5:
+    if len(argv) < 6:
         sys.stderr.write("Error: Invalid arguments.\n")
         sys.stderr.write("    [Usage]: " + scriptName + " <input_SMT2_file> <primes_file> <num_iterations> <log_file> <output_file>\n")
         sys.exit(1)
@@ -288,12 +306,12 @@ def main(argv):
 
     # find pivot solutions
     tempDir = os.getcwd() + "/temp_amc"
-    smtSolver = os.path.dirname(os.path.realpath(__file__)) + "/cvc4-mc/cvc4-1.4/build/src/main/cvc4"
+    smtSolver = os.path.dirname(os.path.realpath(__file__)) + "/../cvc4-mc/cvc4-1.4/build/src/main/cvc4"
 
     if not os.path.exists(tempDir):
         os.makedirs(tempDir)
 
-    timeout = 3000
+    timeout = 2400
     minPivot = 1
 
     epsilon = 0.8 # epsilonMap[maxBitwidth]
@@ -326,6 +344,7 @@ def main(argv):
         (constraint, coeffDecl, prime) = generateEquationConstraint(varMap, primesMap, maxBitwidth, slices)
         constraintList.append(constraint)
         coeffDeclList.append(coeffDecl)
+
         primeList.append(prime)
 
         innerLoopRun = 0
@@ -336,7 +355,7 @@ def main(argv):
 
             generateSMT2FileFromConstraints(smt2prefix, coeffDeclList, constraintList, smt2suffix, tempSMT2FileName)
 
-            cmd = smtSolver + " --bitblast=eager -im --tlimit=" + str(timeout * 1000) + " --maxsolutions=" + str(maxPivot) + " " + tempSMT2FileName + " >" + tempOutputFile + " 2>>" + tempErrorFile;
+            cmd = smtSolver + " -im --tlimit=" + str(timeout * 1000) + " --maxsolutions=" + str(maxPivot) + " --bitblast=eager " + tempSMT2FileName + " >" + tempOutputFile + " 2>>" + tempErrorFile;
             logFile.write("cmd: " + cmd + "\n")
             
             startTime = os.times()
@@ -400,9 +419,9 @@ def main(argv):
 
     finalOutputFile.write(str(scriptEndTime.children_user + scriptEndTime.children_system - scriptStartTime.children_user - scriptStartTime.children_system) + ";")
     finalOutputFile.write(str(len(timedOutRuns)) + ";")
-    if len(timedOutRuns) > 0:
-        logFile.write("Timedout in runs: " + str(timedOutRuns))
-        finalOutputFile.write("Timedout in runs: " + str(timedOutRuns))
+
+    logFile.write("Timedout in runs: " + str(timedOutRuns) + ";")
+    finalOutputFile.write("Timedout in runs: " + str(timedOutRuns))
 
     finalOutputFile.close()
     logFile.close()

@@ -73,7 +73,7 @@ def populateEpsilonMap(probFile):
     return epsilonMap
 
 
-#Function: computeNewBitwidth
+# Function: computeNewBitwidth
 def computeNewBitwidth(k, slices, varMap):
     totalBitwidth = 0
     for key in varMap.keys():
@@ -306,12 +306,12 @@ def main(argv):
 
     # find pivot solutions
     tempDir = os.getcwd() + "/temp_amc"
-    smtSolver = os.path.dirname(os.path.realpath(__file__)) + "/cvc4-mc/cvc4-1.4/build/src/main/cvc4"
+    smtSolver = os.path.dirname(os.path.realpath(__file__)) + "/../cvc4-mc/cvc4-1.4/build/src/main/cvc4"
 
     if not os.path.exists(tempDir):
         os.makedirs(tempDir)
 
-    timeout = 3000
+    timeout = 2400
     minPivot = 1
 
     epsilon = 0.8 # epsilonMap[maxBitwidth]
@@ -355,7 +355,7 @@ def main(argv):
 
             generateSMT2FileFromConstraints(smt2prefix, coeffDeclList, constraintList, smt2suffix, tempSMT2FileName)
 
-            cmd = smtSolver + " -im --tlimit=" + str(timeout * 1000) + " --maxsolutions=" + str(maxPivot) + " --bitblast=eager " + tempSMT2FileName + " >" + tempOutputFile + " 2>>" + tempErrorFile;
+            cmd = smtSolver + " -im --tlimit=" + str(timeout * 1000) + " --maxsolutions=" + str(maxPivot) + " " + tempSMT2FileName + " >" + tempOutputFile + " 2>>" + tempErrorFile;
             logFile.write("cmd: " + cmd + "\n")
             
             startTime = os.times()
