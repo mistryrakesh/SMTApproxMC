@@ -311,7 +311,7 @@ def main(argv):
     if not os.path.exists(tempDir):
         os.makedirs(tempDir)
 
-    timeout = 2400
+    timeout = int(2400 * maxBitwidth / 2.0)
     minPivot = 1
 
     epsilon = 0.8 # epsilonMap[maxBitwidth]
@@ -376,9 +376,6 @@ def main(argv):
             hasTimedOut = False
             (numSolutions, hasTimedOut) = countSolutions(tempOutputFile)
 
-            if hasTimedOut:
-                timedOutRuns.add(i)
-
             logFile.write("numConstraints: " + str(len(constraintList)) + ", slices: " + str(slices) + ", numSolutions: " + str(numSolutions) + ", hasTimedOut: " + str(hasTimedOut) + "\n")
         
             if numSolutions >= maxPivot:
@@ -396,6 +393,9 @@ def main(argv):
                 primeList.pop()
 
                 if (slices >= maxBitwidth):
+                    if hasTimedOut:
+                        timedOutRuns.add(i)
+                        # logFile.write("hasTimedOut after adding last constraint: " + str(hasTimedOut) + "\n")
                     break
 
                 slices = (slices * 2) if (slices * 2) < maxBitwidth else maxBitwidth;
