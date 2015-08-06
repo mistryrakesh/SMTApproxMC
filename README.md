@@ -6,7 +6,7 @@ ApproxMC for SMT Solvers.
 
   1. src/expr/command.cpp (line 999)  
      Added function:  
-     `Expr GetModelCommand::getModelCommandInvoke(SmtEngine* smtEngine, std::ostream& out) throw()`
+``` cpp Expr GetModelCommand::getModelCommandInvoke(SmtEngine* smtEngine, std::ostream& out) throw() ```
 
   2. src/expr/command.h (line 568)  
      Added function:  
