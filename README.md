@@ -17,7 +17,7 @@ ApproxMC for SMT Solvers.
      `bool CommandExecutor::doCheckSatCommandSingleton(Command* cmd)`
 
   4. src/main/command_executor.h (line 81)  
-     Added function:
+     Added function:  
      `bool CommandExecutor::doCheckSatCommandSingleton(Command* cmd);`
 
   5. src/main/driver_unified.cpp (lines 423 to 456)  
