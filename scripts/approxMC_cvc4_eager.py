@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/home/rakeshmistry/bin/Python-3.4.3/bin/python3
 
 # @author: rakesh mistry - 'inspire'
 # @date: 2015-06-14
@@ -311,7 +311,7 @@ def main(argv):
     if not os.path.exists(tempDir):
         os.makedirs(tempDir)
 
-    timeout = int(2400 * maxBitwidth / 2.0)
+    timeout = 10000 #int(2400 * maxBitwidth / 2.0)
     minPivot = 1
 
     epsilon = 0.8 # epsilonMap[maxBitwidth]

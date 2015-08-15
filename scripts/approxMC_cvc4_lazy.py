@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/home/rakeshmistry/bin/Python-3.4.3/bin/python3
 
 # @author: rakesh mistry - 'inspire'
 # @date: 2015-06-14
@@ -306,12 +306,12 @@ def main(argv):
 
     # find pivot solutions
     tempDir = os.getcwd() + "/temp_amc"
-    smtSolver = os.path.dirname(os.path.realpath(__file__)) + "/cvc4-mc/cvc4-1.4/build/src/main/cvc4"
+    smtSolver = os.path.dirname(os.path.realpath(__file__)) + "/../cvc4-mc/cvc4-1.4/build/src/main/cvc4"
 
     if not os.path.exists(tempDir):
         os.makedirs(tempDir)
 
-    timeout = int(2400 * maxBitwidth / 2.0)
+    timeout = 10000 #int(2400 * maxBitwidth / 2.0)
     minPivot = 1
 
     epsilon = 0.8 # epsilonMap[maxBitwidth]

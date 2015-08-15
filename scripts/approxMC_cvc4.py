@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/home/rakeshmistry/bin/Python-3.4.3/bin/python3
 
 # @author: rakesh mistry - 'inspire'
 # @date: 2015-06-14
