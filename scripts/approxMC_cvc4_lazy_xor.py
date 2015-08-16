@@ -142,12 +142,6 @@ def generateSMT2FileFromConstraints(smt2prefix, constraintList, lastAssertLine, 
     outputSMT2File.close()
 
 
-# Function: generateSMT1FromSMT2File
-def generateSMT1FromSMT2File(smt2FileName, smt1FileName):
-    cmd = "boolector -ds1 -o " + smt1FileName + " " + smt2FileName
-    return os.system(cmd)
-
-
 # Funtion: countSolutions
 def countSolutions(smtResultsFileName):
     smtResultsFile = open(smtResultsFileName, "r")
@@ -194,7 +188,7 @@ def main(argv):
 
     # find pivot solutions
     tempDir = os.getcwd() + "/temp_amc"
-    smtSolver = os.path.dirname(os.path.realpath(__file__)) + "/../boolector-mc/boolector/boolector"
+    smtSolver = os.path.dirname(os.path.realpath(__file__)) + "/../cvc4-mc/cvc4-1.4/build/src/main/cvc4"
 
     if not os.path.exists(tempDir):
         os.makedirs(tempDir)
@@ -236,14 +230,7 @@ def main(argv):
 
             generateSMT2FileFromConstraints(smt2prefix, constraintList, lastAssertLine, smt2suffix, tempSMT2FileName)
 
-            conversionResult = generateSMT1FromSMT2File(tempSMT2FileName, tempSMT1FileName)
-            if conversionResult != 0:
-                sys.stderr.write("Error while converting from SMT2 File to SMT1 file. Aborting ...\n")
-                logFile.write("Error while converting from SMT2 File to SMT1 file. Aborting ...\n")
-                logFile.close()
-                exit(1)
-
-            cmd = smtSolver + " -i -m -t " + str(timeout) + " --maxsolutions=" + str(maxPivot) + " " + tempSMT1FileName + " >" + tempOutputFile + " 2>>" + tempErrorFile
+            cmd = smtSolver + " -im --tlimit=" + str(timeout * 1000) + " --maxsolutions=" + str(maxPivot) + " " + tempSMT2FileName + " >" + tempOutputFile + " 2>>" + tempErrorFile
             logFile.write("cmd: " + cmd + "\n")
             
             startTime = os.times()
