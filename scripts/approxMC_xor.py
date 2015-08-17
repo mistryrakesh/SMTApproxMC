@@ -95,8 +95,6 @@ def parseSmt2FileVariables(smt2File):
             if varWidthStr.isdigit():
                 varWidth = int(varWidthStr)
                 varMap[varName] = varWidth
-        elif compiledAssertPattern.search(line):
-            break
 
     return varMap, smtFilePrefix, assertLine
 
@@ -152,15 +150,12 @@ def generateSMT1FromSMT2File(smt2FileName, smt1FileName):
 def countSolutions(smtResultsFileName):
     smtResultsFile = open(smtResultsFileName, "r")
     count = 0
-    hasTimedOut = False
 
     for line in smtResultsFile:
         if line == "sat\n":
             count += 1
-        elif "[btormain] ALARM TRIGGERED: time limit" in line:
-            hasTimedOut = True
 
-    return count, hasTimedOut
+    return count
 
 
 # Function: getCommonIterationsAndMedian
@@ -178,7 +173,7 @@ def getCommonIterationsAndMedian(iterationRunResults):
 def main(argv):
     # check for correct number of arguments
     scriptName = os.path.basename(__file__)
-    if len(argv) < 4:
+    if len(argv) < 5:
         sys.stderr.write("Error: Invalid arguments.\n")
         sys.stderr.write("    [Usage]: " + scriptName + " <input_SMT2_file> <num_iterations> <log_file> <output_file>\n")
         sys.exit(1)
@@ -243,7 +238,7 @@ def main(argv):
                 logFile.close()
                 exit(1)
 
-            cmd = smtSolver + " -i -m -t " + str(timeout) + " --maxsolutions=" + str(maxPivot) + " " + tempSMT1FileName + " >" + tempOutputFile + " 2>>" + tempErrorFile
+            cmd = "doalarm -t profile " + str(timeout) + " " + smtSolver + " -i -m  --maxsolutions=" + str(maxPivot) + " " + tempSMT1FileName + " >" + tempOutputFile + " 2>>" + tempErrorFile;
             logFile.write("cmd: " + cmd + "\n")
             
             startTime = os.times()
@@ -252,9 +247,13 @@ def main(argv):
 
             logFile.write("startTime: " + str(startTime) + "\n")
             logFile.write("endTime: " + str(endTime) + "\n")
-            logFile.write("cmd time: " + str(endTime.children_user + endTime.children_system - startTime.children_user - startTime.children_system) + "\n")
+            logFile.write("cmd time: " + str(endTime.elapsed - startTime.elapsed) + "\n")
 
-            (numSolutions, hasTimedOut) = countSolutions(tempOutputFile)
+            hasTimedOut = False
+            if (endTime.elapsed - startTime.elapsed) > (timeout - 10):
+                hasTimedOut = True
+
+            numSolutions = countSolutions(tempOutputFile)
 
             logFile.write("numSolutions: " + str(numSolutions) + ", hasTimedOut: " + str(hasTimedOut) + "\n")
 

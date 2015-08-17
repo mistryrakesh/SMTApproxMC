@@ -246,15 +246,12 @@ def generateSMT1FromSMT2File(smt2FileName, smt1FileName):
 def countSolutions(smtResultsFileName):
     smtResultsFile = open(smtResultsFileName, "r")
     count = 0
-    hasTimedOut = False
 
     for line in smtResultsFile:
         if line == "sat\n":
             count += 1
-        elif "[btormain] ALARM TRIGGERED: time limit" in line:
-            hasTimedOut = True
 
-    return count, hasTimedOut
+    return count
 
 
 def getCommonPrimesAndMedian(runResults, logFile):
@@ -315,7 +312,7 @@ def main(argv):
     if not os.path.exists(tempDir):
         os.makedirs(tempDir)
 
-    timeout = 10000 #int(2400 * maxBitwidth / 2.0)
+    timeout = 2400
     minPivot = 1
 
     epsilon = 0.8 # epsilonMap[maxBitwidth]
@@ -325,6 +322,7 @@ def main(argv):
     scriptStartTime = os.times()
     logFile.write("Script start time: " + str(scriptStartTime) + "\n")
 
+    logFile.write("maxBitwidth: " + str(maxBitwidth) + "\n")
     logFile.write("Epsilon: " + str(epsilon) + "\n")
     logFile.write("maxPivot: " + str(maxPivot) + "\n")
 
@@ -366,7 +364,7 @@ def main(argv):
                 logFile.close()
                 exit(1)
 
-            cmd = smtSolver + " -i -m -t " + str(timeout) + " --maxsolutions=" + str(maxPivot) + " " + tempSMT1FileName + " >" + tempOutputFile + " 2>>" + tempErrorFile;
+            cmd = "doalarm -t profile " + str(timeout) + " " + smtSolver + " -i -m  --maxsolutions=" + str(maxPivot) + " " + tempSMT1FileName + " >" + tempOutputFile + " 2>>" + tempErrorFile;
             logFile.write("cmd: " + cmd + "\n")
             
             startTime = os.times()
@@ -375,10 +373,13 @@ def main(argv):
 
             logFile.write("startTime: " + str(startTime) + "\n")
             logFile.write("endTime: " + str(endTime) + "\n")
-            logFile.write("cmd time: " + str(endTime.children_user + endTime.children_system - startTime.children_user - startTime.children_system) + "\n")
+            logFile.write("cmd time: " + str(endTime.elapsed - startTime.elapsed) + "\n")
 
             hasTimedOut = False
-            (numSolutions, hasTimedOut) = countSolutions(tempOutputFile)
+            if (endTime.elapsed - startTime.elapsed) > (timeout - 10):
+                hasTimedOut = True
+
+            numSolutions = countSolutions(tempOutputFile)
 
             logFile.write("numConstraints: " + str(len(constraintList)) + ", slices: " + str(slices) + ", numSolutions: " + str(numSolutions) + ", hasTimedOut: " + str(hasTimedOut) + "\n")
         
