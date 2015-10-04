@@ -1,0 +1,219 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configurationDescriptor version="95">
+  <logicalFolder name="root" displayName="root" projectFiles="true" kind="ROOT">
+    <df root="../boolector" name="0">
+      <df name="api">
+        <df name="python">
+          <in>boolector_py.c</in>
+        </df>
+      </df>
+      <df name="dumper">
+        <in>btordumpbtor.c</in>
+        <in>btordumpsmt.c</in>
+      </df>
+      <df name="examples">
+        <df name="array">
+          <in>array1.c</in>
+          <in>array2.c</in>
+          <in>array3.c</in>
+        </df>
+        <df name="bv">
+          <in>bv1.c</in>
+          <in>bv2.c</in>
+        </df>
+      </df>
+      <df name="parser">
+        <in>btorbtor.c</in>
+        <in>btorsmt.c</in>
+        <in>btorsmt2.c</in>
+      </df>
+      <df name="utils">
+        <in>btorhash.c</in>
+        <in>btorinthash.c</in>
+        <in>btoriter.c</in>
+        <in>btormap.c</in>
+        <in>btormem.c</in>
+        <in>btormisc.c</in>
+        <in>btorparamcache.c</in>
+        <in>btorutil.c</in>
+      </df>
+      <in>boolector.c</in>
+      <in>boolectormain.c</in>
+      <in>btor2horn.c</in>
+      <in>btoraig.c</in>
+      <in>btoraigvec.c</in>
+      <in>btorass.c</in>
+      <in>btorbeta.c</in>
+      <in>btorbitvec.c</in>
+      <in>btorchkclone.c</in>
+      <in>btorclone.c</in>
+      <in>btorconst.c</in>
+      <in>btorcore.c</in>
+      <in>btordbg.c</in>
+      <in>btordcr.c</in>
+      <in>btorexp.c</in>
+      <in>btorfmt.c</in>
+      <in>btorlog.c</in>
+      <in>btormain.c</in>
+      <in>btormc.c</in>
+      <in>btorminisat.cc</in>
+      <in>btormodel.c</in>
+      <in>btormsg.c</in>
+      <in>btoropt.c</in>
+      <in>btorparse.c</in>
+      <in>btorprintmodel.c</in>
+      <in>btorrewrite.c</in>
+      <in>btorsat.c</in>
+      <in>btorsort.c</in>
+      <in>btortrapi.c</in>
+      <in>deltabtor.c</in>
+      <in>synthebtor.c</in>
+    </df>
+    <logicalFolder name="ExternalFiles"
+                   displayName="Important Files"
+                   projectFiles="false"
+                   kind="IMPORTANT_FILES_FOLDER">
+      <itemPath>../boolector/Makefile</itemPath>
+      <itemPath>../boolector/configure</itemPath>
+    </logicalFolder>
+  </logicalFolder>
+  <sourceFolderFilter>^(nbproject)$</sourceFolderFilter>
+  <sourceRootList>
+    <Elem>../boolector</Elem>
+  </sourceRootList>
+  <projectmakefile>../boolector/Makefile</projectmakefile>
+  <confs>
+    <conf name="Default" type="0">
+      <toolsSet>
+        <compilerSet>default</compilerSet>
+        <dependencyChecking>false</dependencyChecking>
+        <rebuildPropChanged>false</rebuildPropChanged>
+      </toolsSet>
+      <codeAssistance>
+      </codeAssistance>
+      <makefileType>
+        <makeTool>
+          <buildCommandWorkingDir>../boolector</buildCommandWorkingDir>
+          <buildCommand>${MAKE} -f Makefile</buildCommand>
+          <cleanCommand>${MAKE} -f Makefile clean</cleanCommand>
+          <executablePath></executablePath>
+        </makeTool>
+      </makefileType>
+      <item path="../boolector/api/python/boolector_py.c"
+            ex="false"
+            tool="0"
+            flavor2="2">
+      </item>
+      <item path="../boolector/boolector.c" ex="false" tool="0" flavor2="2">
+      </item>
+      <item path="../boolector/boolectormain.c" ex="false" tool="0" flavor2="2">
+      </item>
+      <item path="../boolector/btor2horn.c" ex="false" tool="0" flavor2="2">
+      </item>
+      <item path="../boolector/btoraig.c" ex="false" tool="0" flavor2="2">
+      </item>
+      <item path="../boolector/btoraigvec.c" ex="false" tool="0" flavor2="2">
+      </item>
+      <item path="../boolector/btorass.c" ex="false" tool="0" flavor2="2">
+      </item>
+      <item path="../boolector/btorbeta.c" ex="false" tool="0" flavor2="2">
+      </item>
+      <item path="../boolector/btorbitvec.c" ex="false" tool="0" flavor2="2">
+      </item>
+      <item path="../boolector/btorchkclone.c" ex="false" tool="0" flavor2="2">
+      </item>
+      <item path="../boolector/btorclone.c" ex="false" tool="0" flavor2="2">
+      </item>
+      <item path="../boolector/btorconst.c" ex="false" tool="0" flavor2="2">
+      </item>
+      <item path="../boolector/btorcore.c" ex="false" tool="0" flavor2="2">
+      </item>
+      <item path="../boolector/btordbg.c" ex="false" tool="0" flavor2="2">
+      </item>
+      <item path="../boolector/btordcr.c" ex="false" tool="0" flavor2="2">
+      </item>
+      <item path="../boolector/btorexp.c" ex="false" tool="0" flavor2="2">
+      </item>
+      <item path="../boolector/btorfmt.c" ex="false" tool="0" flavor2="2">
+      </item>
+      <item path="../boolector/btorlog.c" ex="false" tool="0" flavor2="2">
+      </item>
+      <item path="../boolector/btormain.c" ex="false" tool="0" flavor2="2">
+      </item>
+      <item path="../boolector/btormc.c" ex="false" tool="0" flavor2="2">
+      </item>
+      <item path="../boolector/btorminisat.cc" ex="false" tool="1" flavor2="4">
+      </item>
+      <item path="../boolector/btormodel.c" ex="false" tool="0" flavor2="2">
+      </item>
+      <item path="../boolector/btormsg.c" ex="false" tool="0" flavor2="2">
+      </item>
+      <item path="../boolector/btoropt.c" ex="false" tool="0" flavor2="2">
+      </item>
+      <item path="../boolector/btorparse.c" ex="false" tool="0" flavor2="2">
+      </item>
+      <item path="../boolector/btorprintmodel.c" ex="false" tool="0" flavor2="2">
+      </item>
+      <item path="../boolector/btorrewrite.c" ex="false" tool="0" flavor2="2">
+      </item>
+      <item path="../boolector/btorsat.c" ex="false" tool="0" flavor2="2">
+      </item>
+      <item path="../boolector/btorsort.c" ex="false" tool="0" flavor2="2">
+      </item>
+      <item path="../boolector/btortrapi.c" ex="false" tool="0" flavor2="2">
+      </item>
+      <item path="../boolector/deltabtor.c" ex="false" tool="0" flavor2="2">
+      </item>
+      <item path="../boolector/dumper/btordumpbtor.c" ex="false" tool="0" flavor2="2">
+      </item>
+      <item path="../boolector/dumper/btordumpsmt.c" ex="false" tool="0" flavor2="2">
+      </item>
+      <item path="../boolector/examples/array/array1.c"
+            ex="false"
+            tool="0"
+            flavor2="2">
+      </item>
+      <item path="../boolector/examples/array/array2.c"
+            ex="false"
+            tool="0"
+            flavor2="2">
+      </item>
+      <item path="../boolector/examples/array/array3.c"
+            ex="false"
+            tool="0"
+            flavor2="2">
+      </item>
+      <item path="../boolector/examples/bv/bv1.c" ex="false" tool="0" flavor2="2">
+      </item>
+      <item path="../boolector/examples/bv/bv2.c" ex="false" tool="0" flavor2="2">
+      </item>
+      <item path="../boolector/parser/btorbtor.c" ex="false" tool="0" flavor2="2">
+      </item>
+      <item path="../boolector/parser/btorsmt.c" ex="false" tool="0" flavor2="2">
+      </item>
+      <item path="../boolector/parser/btorsmt2.c" ex="false" tool="0" flavor2="2">
+      </item>
+      <item path="../boolector/synthebtor.c" ex="false" tool="0" flavor2="2">
+      </item>
+      <item path="../boolector/utils/btorhash.c" ex="false" tool="0" flavor2="2">
+      </item>
+      <item path="../boolector/utils/btorinthash.c" ex="false" tool="0" flavor2="2">
+      </item>
+      <item path="../boolector/utils/btoriter.c" ex="false" tool="0" flavor2="2">
+      </item>
+      <item path="../boolector/utils/btormap.c" ex="false" tool="0" flavor2="2">
+      </item>
+      <item path="../boolector/utils/btormem.c" ex="false" tool="0" flavor2="2">
+      </item>
+      <item path="../boolector/utils/btormisc.c" ex="false" tool="0" flavor2="2">
+      </item>
+      <item path="../boolector/utils/btorparamcache.c"
+            ex="false"
+            tool="0"
+            flavor2="2">
+      </item>
+      <item path="../boolector/utils/btorutil.c" ex="false" tool="0" flavor2="2">
+      </item>
+    </conf>
+  </confs>
+</configurationDescriptor>

@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configurationDescriptor version="95">
+  <logicalFolder name="root" displayName="root" projectFiles="true" kind="ROOT">
+    <df root="../boolector" name="0">
+      <df name="api">
+        <df name="python">
+          <in>boolector_py.c</in>
+          <in>boolector_py.h</in>
+        </df>
+      </df>
+      <df name="doc">
+        <df name="_modules">
+        </df>
+        <df name="_sources">
+        </df>
+        <df name="_static">
+        </df>
+      </df>
+      <df name="dumper">
+        <in>btordumpbtor.c</in>
+        <in>btordumpbtor.h</in>
+        <in>btordumpsmt.c</in>
+        <in>btordumpsmt.h</in>
+      </df>
+      <df name="examples">
+        <df name="array">
+          <in>array1.c</in>
+          <in>array2.c</in>
+          <in>array3.c</in>
+        </df>
+        <df name="bv">
+          <in>bv1.c</in>
+          <in>bv2.c</in>
+        </df>
+      </df>
+      <df name="parser">
+        <in>btorbtor.c</in>
+        <in>btorbtor.h</in>
+        <in>btorsmt.c</in>
+        <in>btorsmt.h</in>
+        <in>btorsmt2.c</in>
+        <in>btorsmt2.h</in>
+      </df>
+      <df name="utils">
+        <in>btorhash.c</in>
+        <in>btorhash.h</in>
+        <in>btorinthash.c</in>
+        <in>btorinthash.h</in>
+        <in>btoriter.c</in>
+        <in>btoriter.h</in>
+        <in>btormap.c</in>
+        <in>btormap.h</in>
+        <in>btormem.c</in>
+        <in>btormem.h</in>
+        <in>btormisc.c</in>
+        <in>btormisc.h</in>
+        <in>btorparamcache.c</in>
+        <in>btorparamcache.h</in>
+        <in>btorqueue.h</in>
+        <in>btorstack.h</in>
+        <in>btorutil.c</in>
+        <in>btorutil.h</in>
+      </df>
+      <in>boolector.c</in>
+      <in>boolector.h</in>
+      <in>boolectormain.c</in>
+      <in>btor2horn.c</in>
+      <in>btorabort.h</in>
+      <in>btoraig.c</in>
+      <in>btoraig.h</in>
+      <in>btoraigvec.c</in>
+      <in>btoraigvec.h</in>
+      <in>btorass.c</in>
+      <in>btorass.h</in>
+      <in>btorbeta.c</in>
+      <in>btorbeta.h</in>
+      <in>btorbitvec.c</in>
+      <in>btorbitvec.h</in>
+      <in>btorchkclone.c</in>
+      <in>btorchkclone.h</in>
+      <in>btorclone.c</in>
+      <in>btorclone.h</in>
+      <in>btorconfig.h</in>
+      <in>btorconst.c</in>
+      <in>btorconst.h</in>
+      <in>btorcore.c</in>
+      <in>btorcore.h</in>
+      <in>btordbg.c</in>
+      <in>btordbg.h</in>
+      <in>btordcr.c</in>
+      <in>btordcr.h</in>
+      <in>btorexit.h</in>
+      <in>btorexp.c</in>
+      <in>btorexp.h</in>
+      <in>btorfmt.c</in>
+      <in>btorfmt.h</in>
+      <in>btorlog.c</in>
+      <in>btorlog.h</in>
+      <in>btorlogic.h</in>
+      <in>btormain.c</in>
+      <in>btormain.h</in>
+      <in>btormc.c</in>
+      <in>btormc.h</in>
+      <in>btorminisat.cc</in>
+      <in>btorminisat.h</in>
+      <in>btormodel.c</in>
+      <in>btormodel.h</in>
+      <in>btormsg.c</in>
+      <in>btormsg.h</in>
+      <in>btoropt.c</in>
+      <in>btoropt.h</in>
+      <in>btorparse.c</in>
+      <in>btorparse.h</in>
+      <in>btorprintmodel.c</in>
+      <in>btorprintmodel.h</in>
+      <in>btorrewrite.c</in>
+      <in>btorrewrite.h</in>
+      <in>btorsat.c</in>
+      <in>btorsat.h</in>
+      <in>btorsort.c</in>
+      <in>btorsort.h</in>
+      <in>btortrapi.c</in>
+      <in>btortrapi.h</in>
+      <in>btortypes.h</in>
+      <in>deltabtor.c</in>
+      <in>synthebtor.c</in>
+    </df>
+  </logicalFolder>
+  <projectmakefile>../boolector/Makefile</projectmakefile>
+  <confs>
+    <conf name="Default" type="0">
+      <toolsSet>
+        <developmentServer>localhost</developmentServer>
+        <platform>2</platform>
+      </toolsSet>
+      <compile>
+        <compiledirpicklist>
+          <compiledirpicklistitem>.</compiledirpicklistitem>
+          <compiledirpicklistitem>${AUTO_FOLDER}</compiledirpicklistitem>
+        </compiledirpicklist>
+        <compiledir>${AUTO_FOLDER}</compiledir>
+        <compilecommandpicklist>
+          <compilecommandpicklistitem>${MAKE} ${ITEM_NAME}.o</compilecommandpicklistitem>
+          <compilecommandpicklistitem>${AUTO_COMPILE}</compilecommandpicklistitem>
+        </compilecommandpicklist>
+        <compilecommand>${AUTO_COMPILE}</compilecommand>
+      </compile>
+      <dbx_gdbdebugger version="1">
+        <gdb_pathmaps>
+        </gdb_pathmaps>
+        <gdb_interceptlist>
+          <gdbinterceptoptions gdb_all="false" gdb_unhandled="true" gdb_unexpected="true"/>
+        </gdb_interceptlist>
+        <gdb_options>
+          <DebugOptions>
+          </DebugOptions>
+        </gdb_options>
+        <gdb_buildfirst gdb_buildfirst_overriden="false" gdb_buildfirst_old="false"/>
+      </dbx_gdbdebugger>
+      <nativedebugger version="1">
+        <engine>gdb</engine>
+      </nativedebugger>
+      <runprofile version="9">
+        <runcommandpicklist>
+          <runcommandpicklistitem>"${OUTPUT_PATH}"</runcommandpicklistitem>
+        </runcommandpicklist>
+        <runcommand>"${OUTPUT_PATH}"</runcommand>
+        <rundir>../boolector</rundir>
+        <buildfirst>false</buildfirst>
+        <terminal-type>0</terminal-type>
+        <remove-instrumentation>0</remove-instrumentation>
+        <environment>
+        </environment>
+      </runprofile>
+    </conf>
+  </confs>
+</configurationDescriptor>
