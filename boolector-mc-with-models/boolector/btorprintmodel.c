@@ -484,7 +484,9 @@ BoolectorNode* btor_gen_model_constraint(Btor * btor) {
 		    continue;
         // print_bv_model(btor, cur, format, base, file);
         char *ass = (char *) btor_get_bv_model_str (btor, cur);
-
+        char *symbol = btor_get_symbol_exp (btor, cur);
+        fprintf(stdout, "%s: %s, ", symbol, ass);
+        
         BoolectorNode *const_node = boolector_const(btor, ass);
         BoolectorNode *node = boolector_ne(btor, cur, const_node);
         constraint = boolector_or(btor, constraint, node);
