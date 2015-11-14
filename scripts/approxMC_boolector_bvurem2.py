@@ -403,13 +403,14 @@ def main(argv):
             elif numSolutions >= minPivot and not hasTimedOut:
                 foundCounts = True
                 # break
-                constraintList.pop()
-                coeffDeclList.pop()
-                primeList.pop()
 
                 if (slices >= maxBitwidth):
                     logFile.write("Stopping after foundCounts = True and no further slices possible\n")
                     break
+
+                constraintList.pop()
+                coeffDeclList.pop()
+                primeList.pop()
 
                 slices = (slices * 2) if (slices * 2) < maxBitwidth else maxBitwidth;
 
@@ -419,15 +420,15 @@ def main(argv):
                 primeList.append(prime)
 
             elif numSolutions >= 0:
-                constraintList.pop()
-                coeffDeclList.pop()
-                primeList.pop()
-
                 if (slices >= maxBitwidth):
                     if hasTimedOut:
                         timedOutRuns.add(i)
                         # logFile.write("hasTimedOut after adding last constraint: " + str(hasTimedOut) + "\n")
                     break
+
+                constraintList.pop()
+                coeffDeclList.pop()
+                primeList.pop()
 
                 slices = (slices * 2) if (slices * 2) < maxBitwidth else maxBitwidth;
 
