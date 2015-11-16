@@ -1,0 +1,17 @@
+(benchmark dump
+:logic QF_BV
+:extrafuns ((clok_0 BitVec[1]))
+:extrafuns ((clok_1 BitVec[1]))
+:extrafuns ((flashclk1__U1__sflashclock1_0 BitVec[1]))
+:extrafuns ((flashclk1__U1__sflashclock1_1 BitVec[1]))
+:extrafuns ((rset_0 BitVec[1]))
+:extrafuns ((rset_1 BitVec[1]))
+:extrafuns ((v1 BitVec[8]))
+:extrafuns ((v2 BitVec[8]))
+:formula
+(let (?e3 (= clok_0 clok_1))
+(let (?e4 (and (= rset_0 rset_1) ?e3))
+(let (?e5 (bvand clok_1 (bvnot (ite ?e3 bv1[1] bv0[1]))))
+(let (?e6 (= flashclk1__U1__sflashclock1_0 flashclk1__U1__sflashclock1_1))
+(let (?e7 (and (= v2 bv255[8]) (= v1 bv255[8])))
+ (and (not (and (not ?e6) ?e4)) (and (= bv39[13] (bvurem (bvadd (bvmul bv248[13] (concat bv0[12] flashclk1__U1__sflashclock1_0)) (bvadd (bvmul bv26[13] (concat bv0[12] rset_0)) (bvadd (bvmul bv177[13] (concat bv0[12] rset_1)) (bvadd (bvmul bv115[13] (concat bv0[12] clok_1)) (bvadd (bvmul bv68[13] (concat bv0[12] clok_0)) (bvadd (bvmul bv113[13] (concat bv0[12] flashclk1__U1__sflashclock1_1)) (bvadd (bvmul bv15[13] (concat bv0[5] v1)) (bvmul bv93[13] (concat bv0[5] v2))))))))) bv257[13])) (not (= (bvnot (bvand (bvnot (ite ?e4 bv1[1] bv0[1])) (bvnot (bvand (bvnot (bvand (bvnot flashclk1__U1__sflashclock1_1) rset_1)) (bvnot (bvand (bvnot rset_1) (bvnot (bvand (bvnot (bvand (bvnot ?e5) (bvnot (ite ?e6 bv1[1] bv0[1])))) (bvnot (bvand ?e5 (bvnot (ite (and (not (and (not ?e7) (not ?e6))) (not (and ?e7 (not (= flashclk1__U1__sflashclock1_0 (bvnot flashclk1__U1__sflashclock1_1)))))) bv1[1] bv0[1])))))))))))) bv0[1]))))))))))

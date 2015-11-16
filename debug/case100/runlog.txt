@@ -1,0 +1,234 @@
+Script start time: posix.times_result(user=0.18, system=0.05, children_user=0.0, children_system=0.0, elapsed=32051973.08)
+maxBitwidth: 16
+Epsilon: 0.8
+maxPivot: 52
+
+
+################################################################################
+Iteration: 0
+
+----
+innerLoopRun: 0
+cmd: doalarm -t profile 2400 /home/rakeshmistry/Documents/approxMC/scripts/../boolector-mc/boolector/boolector -i -m  --maxsolutions=52 /home/rakeshmistry/Documents/misc/boolector_prime_bvurem2_fixed/case100/temp_amc/temp_0_0.smt1 >/home/rakeshmistry/Documents/misc/boolector_prime_bvurem2_fixed/case100/temp_amc/solverResults_0_0.txt 2>>/home/rakeshmistry/Documents/misc/boolector_prime_bvurem2_fixed/case100/temp_amc/solverErrors_0_0.txt
+startTime: posix.times_result(user=0.18, system=0.05, children_user=0.0, children_system=0.0, elapsed=32051973.12)
+endTime: posix.times_result(user=0.18, system=0.05, children_user=0.47, children_system=0.02, elapsed=32051973.63)
+cmd time: 0.5099999979138374
+Current prime list: [257]
+numConstraints: 1, slices: 2, numSolutions: 53, hasTimedOut: False
+
+----
+innerLoopRun: 1
+cmd: doalarm -t profile 2400 /home/rakeshmistry/Documents/approxMC/scripts/../boolector-mc/boolector/boolector -i -m  --maxsolutions=52 /home/rakeshmistry/Documents/misc/boolector_prime_bvurem2_fixed/case100/temp_amc/temp_0_1.smt1 >/home/rakeshmistry/Documents/misc/boolector_prime_bvurem2_fixed/case100/temp_amc/solverResults_0_1.txt 2>>/home/rakeshmistry/Documents/misc/boolector_prime_bvurem2_fixed/case100/temp_amc/solverErrors_0_1.txt
+startTime: posix.times_result(user=0.18, system=0.05, children_user=0.47, children_system=0.03, elapsed=32051973.66)
+endTime: posix.times_result(user=0.18, system=0.05, children_user=8.81, children_system=0.17, elapsed=32051982.17)
+cmd time: 8.510000001639128
+Current prime list: [257, 257]
+numConstraints: 2, slices: 2, numSolutions: 37, hasTimedOut: False
+
+----
+innerLoopRun: 2
+cmd: doalarm -t profile 2400 /home/rakeshmistry/Documents/approxMC/scripts/../boolector-mc/boolector/boolector -i -m  --maxsolutions=52 /home/rakeshmistry/Documents/misc/boolector_prime_bvurem2_fixed/case100/temp_amc/temp_0_2.smt1 >/home/rakeshmistry/Documents/misc/boolector_prime_bvurem2_fixed/case100/temp_amc/solverResults_0_2.txt 2>>/home/rakeshmistry/Documents/misc/boolector_prime_bvurem2_fixed/case100/temp_amc/solverErrors_0_2.txt
+startTime: posix.times_result(user=0.18, system=0.06, children_user=8.81, children_system=0.18, elapsed=32051982.2)
+endTime: posix.times_result(user=0.18, system=0.06, children_user=11.87, children_system=0.24, elapsed=32051985.33)
+cmd time: 3.1299999989569187
+Current prime list: [257, 17]
+numConstraints: 2, slices: 4, numSolutions: 53, hasTimedOut: False
+Stopping after foundCounts = True and numSolutions >= maxPivot
+
+
+################################################################################
+Iteration: 1
+
+----
+innerLoopRun: 0
+cmd: doalarm -t profile 2400 /home/rakeshmistry/Documents/approxMC/scripts/../boolector-mc/boolector/boolector -i -m  --maxsolutions=52 /home/rakeshmistry/Documents/misc/boolector_prime_bvurem2_fixed/case100/temp_amc/temp_1_0.smt1 >/home/rakeshmistry/Documents/misc/boolector_prime_bvurem2_fixed/case100/temp_amc/solverResults_1_0.txt 2>>/home/rakeshmistry/Documents/misc/boolector_prime_bvurem2_fixed/case100/temp_amc/solverErrors_1_0.txt
+startTime: posix.times_result(user=0.18, system=0.06, children_user=11.87, children_system=0.24, elapsed=32051985.36)
+endTime: posix.times_result(user=0.18, system=0.06, children_user=12.11, children_system=0.26, elapsed=32051985.64)
+cmd time: 0.2800000011920929
+Current prime list: [257]
+numConstraints: 1, slices: 2, numSolutions: 53, hasTimedOut: False
+
+----
+innerLoopRun: 1
+cmd: doalarm -t profile 2400 /home/rakeshmistry/Documents/approxMC/scripts/../boolector-mc/boolector/boolector -i -m  --maxsolutions=52 /home/rakeshmistry/Documents/misc/boolector_prime_bvurem2_fixed/case100/temp_amc/temp_1_1.smt1 >/home/rakeshmistry/Documents/misc/boolector_prime_bvurem2_fixed/case100/temp_amc/solverResults_1_1.txt 2>>/home/rakeshmistry/Documents/misc/boolector_prime_bvurem2_fixed/case100/temp_amc/solverErrors_1_1.txt
+startTime: posix.times_result(user=0.19, system=0.06, children_user=12.12, children_system=0.27, elapsed=32051985.67)
+endTime: posix.times_result(user=0.19, system=0.06, children_user=18.02, children_system=0.33, elapsed=32051991.66)
+cmd time: 5.989999998360872
+Current prime list: [257, 257]
+numConstraints: 2, slices: 2, numSolutions: 27, hasTimedOut: False
+
+----
+innerLoopRun: 2
+cmd: doalarm -t profile 2400 /home/rakeshmistry/Documents/approxMC/scripts/../boolector-mc/boolector/boolector -i -m  --maxsolutions=52 /home/rakeshmistry/Documents/misc/boolector_prime_bvurem2_fixed/case100/temp_amc/temp_1_2.smt1 >/home/rakeshmistry/Documents/misc/boolector_prime_bvurem2_fixed/case100/temp_amc/solverResults_1_2.txt 2>>/home/rakeshmistry/Documents/misc/boolector_prime_bvurem2_fixed/case100/temp_amc/solverErrors_1_2.txt
+startTime: posix.times_result(user=0.19, system=0.06, children_user=18.02, children_system=0.33, elapsed=32051991.69)
+endTime: posix.times_result(user=0.19, system=0.06, children_user=20.01, children_system=0.38, elapsed=32051993.74)
+cmd time: 2.0499999970197678
+Current prime list: [257, 17]
+numConstraints: 2, slices: 4, numSolutions: 53, hasTimedOut: False
+Stopping after foundCounts = True and numSolutions >= maxPivot
+
+
+################################################################################
+Iteration: 2
+
+----
+innerLoopRun: 0
+cmd: doalarm -t profile 2400 /home/rakeshmistry/Documents/approxMC/scripts/../boolector-mc/boolector/boolector -i -m  --maxsolutions=52 /home/rakeshmistry/Documents/misc/boolector_prime_bvurem2_fixed/case100/temp_amc/temp_2_0.smt1 >/home/rakeshmistry/Documents/misc/boolector_prime_bvurem2_fixed/case100/temp_amc/solverResults_2_0.txt 2>>/home/rakeshmistry/Documents/misc/boolector_prime_bvurem2_fixed/case100/temp_amc/solverErrors_2_0.txt
+startTime: posix.times_result(user=0.19, system=0.06, children_user=20.01, children_system=0.38, elapsed=32051993.77)
+endTime: posix.times_result(user=0.19, system=0.06, children_user=20.23, children_system=0.39, elapsed=32051994.02)
+cmd time: 0.25
+Current prime list: [257]
+numConstraints: 1, slices: 2, numSolutions: 53, hasTimedOut: False
+
+----
+innerLoopRun: 1
+cmd: doalarm -t profile 2400 /home/rakeshmistry/Documents/approxMC/scripts/../boolector-mc/boolector/boolector -i -m  --maxsolutions=52 /home/rakeshmistry/Documents/misc/boolector_prime_bvurem2_fixed/case100/temp_amc/temp_2_1.smt1 >/home/rakeshmistry/Documents/misc/boolector_prime_bvurem2_fixed/case100/temp_amc/solverResults_2_1.txt 2>>/home/rakeshmistry/Documents/misc/boolector_prime_bvurem2_fixed/case100/temp_amc/solverErrors_2_1.txt
+startTime: posix.times_result(user=0.19, system=0.06, children_user=20.24, children_system=0.4, elapsed=32051994.05)
+endTime: posix.times_result(user=0.19, system=0.07, children_user=22.97, children_system=0.44, elapsed=32051996.85)
+cmd time: 2.800000000745058
+Current prime list: [257, 257]
+numConstraints: 2, slices: 2, numSolutions: 31, hasTimedOut: False
+
+----
+innerLoopRun: 2
+cmd: doalarm -t profile 2400 /home/rakeshmistry/Documents/approxMC/scripts/../boolector-mc/boolector/boolector -i -m  --maxsolutions=52 /home/rakeshmistry/Documents/misc/boolector_prime_bvurem2_fixed/case100/temp_amc/temp_2_2.smt1 >/home/rakeshmistry/Documents/misc/boolector_prime_bvurem2_fixed/case100/temp_amc/solverResults_2_2.txt 2>>/home/rakeshmistry/Documents/misc/boolector_prime_bvurem2_fixed/case100/temp_amc/solverErrors_2_2.txt
+startTime: posix.times_result(user=0.19, system=0.07, children_user=22.98, children_system=0.44, elapsed=32051996.88)
+endTime: posix.times_result(user=0.19, system=0.07, children_user=24.38, children_system=0.46, elapsed=32051998.33)
+cmd time: 1.449999999254942
+Current prime list: [257, 17]
+numConstraints: 2, slices: 4, numSolutions: 53, hasTimedOut: False
+Stopping after foundCounts = True and numSolutions >= maxPivot
+
+
+################################################################################
+Iteration: 3
+
+----
+innerLoopRun: 0
+cmd: doalarm -t profile 2400 /home/rakeshmistry/Documents/approxMC/scripts/../boolector-mc/boolector/boolector -i -m  --maxsolutions=52 /home/rakeshmistry/Documents/misc/boolector_prime_bvurem2_fixed/case100/temp_amc/temp_3_0.smt1 >/home/rakeshmistry/Documents/misc/boolector_prime_bvurem2_fixed/case100/temp_amc/solverResults_3_0.txt 2>>/home/rakeshmistry/Documents/misc/boolector_prime_bvurem2_fixed/case100/temp_amc/solverErrors_3_0.txt
+startTime: posix.times_result(user=0.19, system=0.07, children_user=24.39, children_system=0.46, elapsed=32051998.36)
+endTime: posix.times_result(user=0.19, system=0.07, children_user=24.55, children_system=0.47, elapsed=32051998.54)
+cmd time: 0.17999999970197678
+Current prime list: [257]
+numConstraints: 1, slices: 2, numSolutions: 53, hasTimedOut: False
+
+----
+innerLoopRun: 1
+cmd: doalarm -t profile 2400 /home/rakeshmistry/Documents/approxMC/scripts/../boolector-mc/boolector/boolector -i -m  --maxsolutions=52 /home/rakeshmistry/Documents/misc/boolector_prime_bvurem2_fixed/case100/temp_amc/temp_3_1.smt1 >/home/rakeshmistry/Documents/misc/boolector_prime_bvurem2_fixed/case100/temp_amc/solverResults_3_1.txt 2>>/home/rakeshmistry/Documents/misc/boolector_prime_bvurem2_fixed/case100/temp_amc/solverErrors_3_1.txt
+startTime: posix.times_result(user=0.19, system=0.07, children_user=24.55, children_system=0.47, elapsed=32051998.57)
+endTime: posix.times_result(user=0.19, system=0.07, children_user=30.03, children_system=0.54, elapsed=32052004.14)
+cmd time: 5.570000000298023
+Current prime list: [257, 257]
+numConstraints: 2, slices: 2, numSolutions: 31, hasTimedOut: False
+
+----
+innerLoopRun: 2
+cmd: doalarm -t profile 2400 /home/rakeshmistry/Documents/approxMC/scripts/../boolector-mc/boolector/boolector -i -m  --maxsolutions=52 /home/rakeshmistry/Documents/misc/boolector_prime_bvurem2_fixed/case100/temp_amc/temp_3_2.smt1 >/home/rakeshmistry/Documents/misc/boolector_prime_bvurem2_fixed/case100/temp_amc/solverResults_3_2.txt 2>>/home/rakeshmistry/Documents/misc/boolector_prime_bvurem2_fixed/case100/temp_amc/solverErrors_3_2.txt
+startTime: posix.times_result(user=0.2, system=0.07, children_user=30.03, children_system=0.54, elapsed=32052004.17)
+endTime: posix.times_result(user=0.2, system=0.07, children_user=31.21, children_system=0.58, elapsed=32052005.4)
+cmd time: 1.2299999967217445
+Current prime list: [257, 17]
+numConstraints: 2, slices: 4, numSolutions: 53, hasTimedOut: False
+Stopping after foundCounts = True and numSolutions >= maxPivot
+
+
+################################################################################
+Iteration: 4
+
+----
+innerLoopRun: 0
+cmd: doalarm -t profile 2400 /home/rakeshmistry/Documents/approxMC/scripts/../boolector-mc/boolector/boolector -i -m  --maxsolutions=52 /home/rakeshmistry/Documents/misc/boolector_prime_bvurem2_fixed/case100/temp_amc/temp_4_0.smt1 >/home/rakeshmistry/Documents/misc/boolector_prime_bvurem2_fixed/case100/temp_amc/solverResults_4_0.txt 2>>/home/rakeshmistry/Documents/misc/boolector_prime_bvurem2_fixed/case100/temp_amc/solverErrors_4_0.txt
+startTime: posix.times_result(user=0.2, system=0.07, children_user=31.21, children_system=0.58, elapsed=32052005.42)
+endTime: posix.times_result(user=0.2, system=0.07, children_user=31.6, children_system=0.59, elapsed=32052005.84)
+cmd time: 0.41999999806284904
+Current prime list: [257]
+numConstraints: 1, slices: 2, numSolutions: 53, hasTimedOut: False
+
+----
+innerLoopRun: 1
+cmd: doalarm -t profile 2400 /home/rakeshmistry/Documents/approxMC/scripts/../boolector-mc/boolector/boolector -i -m  --maxsolutions=52 /home/rakeshmistry/Documents/misc/boolector_prime_bvurem2_fixed/case100/temp_amc/temp_4_1.smt1 >/home/rakeshmistry/Documents/misc/boolector_prime_bvurem2_fixed/case100/temp_amc/solverResults_4_1.txt 2>>/home/rakeshmistry/Documents/misc/boolector_prime_bvurem2_fixed/case100/temp_amc/solverErrors_4_1.txt
+startTime: posix.times_result(user=0.2, system=0.07, children_user=31.6, children_system=0.59, elapsed=32052005.87)
+endTime: posix.times_result(user=0.2, system=0.07, children_user=39.39, children_system=0.74, elapsed=32052013.83)
+cmd time: 7.959999997168779
+Current prime list: [257, 257]
+numConstraints: 2, slices: 2, numSolutions: 33, hasTimedOut: False
+
+----
+innerLoopRun: 2
+cmd: doalarm -t profile 2400 /home/rakeshmistry/Documents/approxMC/scripts/../boolector-mc/boolector/boolector -i -m  --maxsolutions=52 /home/rakeshmistry/Documents/misc/boolector_prime_bvurem2_fixed/case100/temp_amc/temp_4_2.smt1 >/home/rakeshmistry/Documents/misc/boolector_prime_bvurem2_fixed/case100/temp_amc/solverResults_4_2.txt 2>>/home/rakeshmistry/Documents/misc/boolector_prime_bvurem2_fixed/case100/temp_amc/solverErrors_4_2.txt
+startTime: posix.times_result(user=0.2, system=0.07, children_user=39.4, children_system=0.74, elapsed=32052013.87)
+endTime: posix.times_result(user=0.2, system=0.07, children_user=41.84, children_system=0.79, elapsed=32052016.38)
+cmd time: 2.5099999979138374
+Current prime list: [257, 17]
+numConstraints: 2, slices: 4, numSolutions: 53, hasTimedOut: False
+Stopping after foundCounts = True and numSolutions >= maxPivot
+
+
+################################################################################
+Iteration: 5
+
+----
+innerLoopRun: 0
+cmd: doalarm -t profile 2400 /home/rakeshmistry/Documents/approxMC/scripts/../boolector-mc/boolector/boolector -i -m  --maxsolutions=52 /home/rakeshmistry/Documents/misc/boolector_prime_bvurem2_fixed/case100/temp_amc/temp_5_0.smt1 >/home/rakeshmistry/Documents/misc/boolector_prime_bvurem2_fixed/case100/temp_amc/solverResults_5_0.txt 2>>/home/rakeshmistry/Documents/misc/boolector_prime_bvurem2_fixed/case100/temp_amc/solverErrors_5_0.txt
+startTime: posix.times_result(user=0.2, system=0.07, children_user=41.84, children_system=0.79, elapsed=32052016.4)
+endTime: posix.times_result(user=0.2, system=0.07, children_user=42.01, children_system=0.8, elapsed=32052016.6)
+cmd time: 0.20000000298023224
+Current prime list: [257]
+numConstraints: 1, slices: 2, numSolutions: 53, hasTimedOut: False
+
+----
+innerLoopRun: 1
+cmd: doalarm -t profile 2400 /home/rakeshmistry/Documents/approxMC/scripts/../boolector-mc/boolector/boolector -i -m  --maxsolutions=52 /home/rakeshmistry/Documents/misc/boolector_prime_bvurem2_fixed/case100/temp_amc/temp_5_1.smt1 >/home/rakeshmistry/Documents/misc/boolector_prime_bvurem2_fixed/case100/temp_amc/solverResults_5_1.txt 2>>/home/rakeshmistry/Documents/misc/boolector_prime_bvurem2_fixed/case100/temp_amc/solverErrors_5_1.txt
+startTime: posix.times_result(user=0.21, system=0.07, children_user=42.01, children_system=0.81, elapsed=32052016.62)
+endTime: posix.times_result(user=0.21, system=0.07, children_user=47.41, children_system=0.89, elapsed=32052022.14)
+cmd time: 5.519999999552965
+Current prime list: [257, 257]
+numConstraints: 2, slices: 2, numSolutions: 30, hasTimedOut: False
+
+----
+innerLoopRun: 2
+cmd: doalarm -t profile 2400 /home/rakeshmistry/Documents/approxMC/scripts/../boolector-mc/boolector/boolector -i -m  --maxsolutions=52 /home/rakeshmistry/Documents/misc/boolector_prime_bvurem2_fixed/case100/temp_amc/temp_5_2.smt1 >/home/rakeshmistry/Documents/misc/boolector_prime_bvurem2_fixed/case100/temp_amc/solverResults_5_2.txt 2>>/home/rakeshmistry/Documents/misc/boolector_prime_bvurem2_fixed/case100/temp_amc/solverErrors_5_2.txt
+startTime: posix.times_result(user=0.21, system=0.07, children_user=47.42, children_system=0.89, elapsed=32052022.16)
+endTime: posix.times_result(user=0.21, system=0.07, children_user=48.24, children_system=0.91, elapsed=32052023.03)
+cmd time: 0.8700000010430813
+Current prime list: [257, 17]
+numConstraints: 2, slices: 4, numSolutions: 53, hasTimedOut: False
+Stopping after foundCounts = True and numSolutions >= maxPivot
+
+
+################################################################################
+Iteration: 6
+
+----
+innerLoopRun: 0
+cmd: doalarm -t profile 2400 /home/rakeshmistry/Documents/approxMC/scripts/../boolector-mc/boolector/boolector -i -m  --maxsolutions=52 /home/rakeshmistry/Documents/misc/boolector_prime_bvurem2_fixed/case100/temp_amc/temp_6_0.smt1 >/home/rakeshmistry/Documents/misc/boolector_prime_bvurem2_fixed/case100/temp_amc/solverResults_6_0.txt 2>>/home/rakeshmistry/Documents/misc/boolector_prime_bvurem2_fixed/case100/temp_amc/solverErrors_6_0.txt
+startTime: posix.times_result(user=0.21, system=0.07, children_user=48.25, children_system=0.92, elapsed=32052023.06)
+endTime: posix.times_result(user=0.21, system=0.07, children_user=48.61, children_system=0.93, elapsed=32052023.46)
+cmd time: 0.4000000022351742
+Current prime list: [257]
+numConstraints: 1, slices: 2, numSolutions: 53, hasTimedOut: False
+
+----
+innerLoopRun: 1
+cmd: doalarm -t profile 2400 /home/rakeshmistry/Documents/approxMC/scripts/../boolector-mc/boolector/boolector -i -m  --maxsolutions=52 /home/rakeshmistry/Documents/misc/boolector_prime_bvurem2_fixed/case100/temp_amc/temp_6_1.smt1 >/home/rakeshmistry/Documents/misc/boolector_prime_bvurem2_fixed/case100/temp_amc/solverResults_6_1.txt 2>>/home/rakeshmistry/Documents/misc/boolector_prime_bvurem2_fixed/case100/temp_amc/solverErrors_6_1.txt
+startTime: posix.times_result(user=0.21, system=0.07, children_user=48.62, children_system=0.94, elapsed=32052023.49)
+endTime: posix.times_result(user=0.21, system=0.07, children_user=58.57, children_system=1.09, elapsed=32052033.64)
+cmd time: 10.150000002235174
+Current prime list: [257, 257]
+numConstraints: 2, slices: 2, numSolutions: 35, hasTimedOut: False
+
+----
+innerLoopRun: 2
+cmd: doalarm -t profile 2400 /home/rakeshmistry/Documents/approxMC/scripts/../boolector-mc/boolector/boolector -i -m  --maxsolutions=52 /home/rakeshmistry/Documents/misc/boolector_prime_bvurem2_fixed/case100/temp_amc/temp_6_2.smt1 >/home/rakeshmistry/Documents/misc/boolector_prime_bvurem2_fixed/case100/temp_amc/solverResults_6_2.txt 2>>/home/rakeshmistry/Documents/misc/boolector_prime_bvurem2_fixed/case100/temp_amc/solverErrors_6_2.txt
+startTime: posix.times_result(user=0.21, system=0.08, children_user=58.58, children_system=1.1, elapsed=32052033.67)
+endTime: posix.times_result(user=0.21, system=0.08, children_user=61.51, children_system=1.16, elapsed=32052036.7)
+cmd time: 3.0299999974668026
+Current prime list: [257, 17]
+numConstraints: 2, slices: 4, numSolutions: 53, hasTimedOut: False
+Stopping after foundCounts = True and numSolutions >= maxPivot
+Script end time: posix.times_result(user=0.21, system=0.08, children_user=61.51, children_system=1.16, elapsed=32052036.7)
+Total script time: 62.669999999999995
+iterationRunResults: [(53, Counter({257: 1, 17: 1})), (53, Counter({257: 1, 17: 1})), (53, Counter({257: 1, 17: 1})), (53, Counter({257: 1, 17: 1})), (53, Counter({257: 1, 17: 1})), (53, Counter({257: 1, 17: 1})), (53, Counter({257: 1, 17: 1}))]
+commomPrimes: [257, 17]
+valList: [53, 53, 53, 53, 53, 53, 53]
+commonPrimes: [257, 17], median: 53.0, Timedout in runs: set();

@@ -1,0 +1,19 @@
+(benchmark dump
+:logic QF_BV
+:extrafuns ((clok_0 BitVec[1]))
+:extrafuns ((clok_1 BitVec[1]))
+:extrafuns ((flashclk1__U1__sflashclock1_0 BitVec[1]))
+:extrafuns ((flashclk1__U1__sflashclock1_1 BitVec[1]))
+:extrafuns ((rset_0 BitVec[1]))
+:extrafuns ((rset_1 BitVec[1]))
+:extrafuns ((v1 BitVec[4]))
+:extrafuns ((v2 BitVec[4]))
+:extrafuns ((v3 BitVec[4]))
+:extrafuns ((v4 BitVec[4]))
+:formula
+(let (?e5 (= clok_0 clok_1))
+(let (?e6 (and (= rset_0 rset_1) ?e5))
+(let (?e7 (bvand clok_1 (bvnot (ite ?e5 bv1[1] bv0[1]))))
+(let (?e8 (= flashclk1__U1__sflashclock1_0 flashclk1__U1__sflashclock1_1))
+(let (?e9 (and (= v2 bv15[4]) (= v1 bv15[4]) (= v3 bv15[4]) (= v4 bv15[4])))
+ (and (not (and (not ?e8) ?e6)) (and (= bv2[11] (bvurem (bvadd (bvmul bv6[11] (concat bv0[10] flashclk1__U1__sflashclock1_0)) (bvadd (bvmul bv14[11] (concat bv0[10] rset_0)) (bvadd (bvmul bv12[11] (concat bv0[10] rset_1)) (bvadd (bvmul bv11[11] (concat bv0[10] clok_1)) (bvadd (bvmul bv7[11] (concat bv0[10] clok_0)) (bvadd (bvmul bv13[11] (concat bv0[10] flashclk1__U1__sflashclock1_1)) (bvadd (bvadd (bvadd (bvmul bv12[11] (concat bv0[7] v1)) (bvmul bv11[11] (concat bv0[7] v2))) (bvmul bv9[11] (concat bv0[7] v3))) (bvmul bv2[11] (concat bv0[7] v4))))))))) bv17[11])) (and (= bv169[13] (bvurem (bvadd (bvmul bv150[13] (concat bv0[12] flashclk1__U1__sflashclock1_0)) (bvadd (bvmul bv95[13] (concat bv0[12] rset_0)) (bvadd (bvmul bv69[13] (concat bv0[12] rset_1)) (bvadd (bvmul bv183[13] (concat bv0[12] clok_1)) (bvadd (bvmul bv164[13] (concat bv0[12] clok_0)) (bvadd (bvmul bv131[13] (concat bv0[12] flashclk1__U1__sflashclock1_1)) (bvadd (bvmul bv207[13] (concat (concat bv0[5] v1) v2)) (bvmul bv205[13] (concat (concat bv0[5] v3) v4))))))))) bv257[13])) (not (= (bvnot (bvand (bvnot (ite ?e6 bv1[1] bv0[1])) (bvnot (bvand (bvnot (bvand (bvnot flashclk1__U1__sflashclock1_1) rset_1)) (bvnot (bvand (bvnot rset_1) (bvnot (bvand (bvnot (bvand (bvnot ?e7) (bvnot (ite ?e8 bv1[1] bv0[1])))) (bvnot (bvand ?e7 (bvnot (ite (and (not (and (not ?e9) (not ?e8))) (not (and ?e9 (not (= flashclk1__U1__sflashclock1_0 (bvnot flashclk1__U1__sflashclock1_1)))))) bv1[1] bv0[1])))))))))))) bv0[1])))))))))))
