@@ -1,7 +1,7 @@
 #!/home/rakeshmistry/bin/Python-3.4.3/bin/python3
 
 # @author: rakesh mistry - 'inspire'
-# @date: 2015-12-24
+# @date: 2015-06-14
 
 import sys
 import re
@@ -46,26 +46,37 @@ def bvuremExpr(var1, var2):
 
 # Function: populatePrimesMap
 # @param: primesMap - file containing primes.
-#         Each line is of the form "k prime"
+#         Each line is of the form -- k prime
 #         where for every number 'k' the value of 'prime' is smallest prime > 2^k
 #
-# @return: map of prime numbers for 2^k (1 <= k <= 100 in our file)
+# returns map of prime numbers for 2^k (1 <= k <= 100)
 def populatePrimesMap(primesFile):
     primesMap = {}
     for line in primesFile:
         strList = line.split()
-        primesMap[int(strList[0])] = int(strList[1])
+        k = int(strList[0])
+        primesMap[k] = int(strList[1])
 
     return primesMap
 
 
-# Function: computeNewBitwidth
-# @param: k - max width of a slice (computed from max bitwidth of all variables)
-# @param: slices - number of slices of a variable
-# @param: varMap - a map of variables with key as variable name and value being
-#         its width
+# Function: populatePrimesMap
+# @param: primesMap - file containing primes.
+#         Each line is of the form -- k prime
+#         where for every number 'k' the value of 'prime' is smallest prime > 2^k
 #
-# @return: new
+# returns map of prime numbers for 2^k (1 <= k <= 100)
+def populateEpsilonMap(probFile):
+    epsilonMap = {}
+    for line in probFile:
+        strList = line.rstrip().split(":")
+        k = int(strList[0])
+        epsilonMap[k] = float(strList[1])
+
+    return epsilonMap
+
+
+# Function: computeNewBitwidth
 def computeNewBitwidth(k, slices, varMap):
     totalBitwidth = 0
     for key in varMap.keys():
@@ -76,48 +87,16 @@ def computeNewBitwidth(k, slices, varMap):
     return newBitwidth
 
 
-# Function: getSliceWidths
-# @param: maxBitWidth - maximum bit width among all variables
-# @param: slices - number of slices of the variable to make
-#
-# @return: bit widths for every slice of the variables
-#
-# The function computes the width of all slices of a variable
-def getSliceWidths(maxBitwidth, slices):
-
-    # find widths for the slices of variable
-    keyDivWidth = int(maxBitwidth / slices)
-    bitRemaining = maxBitwidth % slices
-    
-    # list containing width of each variable slice
-    keyDivWidthList = [keyDivWidth] * slices
-            
-    for i in range(bitRemaining):
-        keyDivWidthList[i] += 1
-    
-    return keyDivWidthList
-
-
-# Function: generateCoeff
-# @param: n - number of coefficients to generate
-# @param: p - max value of coefficient
-def generateCoeff(n, p):
-    coeff = []
-    for i in range(n):
-        coeff.append(random.randint(0, p - 1))
-
-    return coeff
-
-
 # Function: generateEquationConstraint
 # @param: varmap - a map of variables with key as variable name and value being
 #         its width
-# @param: maxBitwidth - maximum bitwidth among all variables
+# @param: maxBitwidth - maximum bitwidth
 # @param: slices - number of slices for each variable to create
 #
 # Generates an equation of the form:
-#     (a1x1 + a2x2 + ...) mod p = r
+#     a1x1 + a2x2 + ... = s*prime + r
 def generateEquationConstraint(varMap, primesMap, maxBitwidth, slices):
+    generateEquationConstraint.counter += 1
 
     k = int(math.ceil(float(maxBitwidth) / slices))
 
@@ -125,6 +104,9 @@ def generateEquationConstraint(varMap, primesMap, maxBitwidth, slices):
     prime = primesMap[k]
 
     newBitwidth = computeNewBitwidth(k, slices, varMap)
+
+    primeCoeff = "temp_prime_coeff_" + str(generateEquationConstraint.counter)
+    primeCoeffDecl = "(declare-fun " + primeCoeff + " () (_ BitVec " + str(newBitwidth - (k + 1)) + "))\n"
 
     bvmulList = []
     for key in varMap.keys():
@@ -134,49 +116,53 @@ def generateEquationConstraint(varMap, primesMap, maxBitwidth, slices):
 
         assert maxBitwidth >= slices
 
-        keySliceWidthList = getSliceWidths(maxBitwidth, slices) # get width of each slice
+        # find slice widths of variable
+        keyDivWidth = int(maxBitwidth / slices)
+        bitRemaining = maxBitwidth % slices
+        
+        # list containing width of each variable slice
+        keyDivWidthList = [keyDivWidth] * slices
+            
+        for i in range(bitRemaining):
+            keyDivWidthList[i] += 1
 
-        # generate slices of variables
-        keySlices = [] # list containing slices of the variable
+        coeff = []
+        for i in range(slices):
+            coeff.append(random.randint(0, twoPowerK - 1))
+
+        keyDivs = []
         msbPos = maxBitwidth - 1
         remSlices = 0
         for i in range(slices):
-            lsbPos = msbPos - keySliceWidthList[i] + 1
+            lsbPos = msbPos - keyDivWidthList[i] + 1
             if lsbPos < varMap[originalKey]:
-                keySlices.append(extractExpr(msbPos, lsbPos, key))
+                keyDivs.append(extractExpr(msbPos, lsbPos, key))
                 remSlices += 1
-            msbPos = msbPos - keySliceWidthList[i]
+            msbPos = msbPos - keyDivWidthList[i]
 
-        # zero extend the slices of variables
-        zxtndKeySlices = [] # list containing zero extended slices of the variable
+        zxtndKeyDivs = []
         for i in range(remSlices):
-            zxtndKeySlices.append(zeroExtendExpr(newBitwidth - keySliceWidthList[i], keySlices[i]))
+            zxtndKeyDivs.append(zeroExtendExpr(newBitwidth - keyDivWidthList[i], keyDivs[i]))
 
-        coeff = generateCoeff(remSlices, twoPowerK) # generate 'remSlices' number of coefficients
-        bvmulStrs = [] # list of strings representing each 'aixi'
+        bvmulStrs = []
         for i in range(remSlices):
-            bvmulList.append(bvmulExpr(constExpr(coeff[i], newBitwidth), zxtndKeySlices[i]))
+            bvmulList.append(bvmulExpr(constExpr(coeff[i], newBitwidth), zxtndKeyDivs[i]))
 
-    # generate string representing 'a1x1 + a2x2 + ...'
+
     lhsStr = functools.reduce(lambda x, y: bvaddExpr(x, y), bvmulList)
-
-    # generate string representing '(a1x1 + a2x2 + ...) mod p'
     lhsStr = bvuremExpr(lhsStr, constExpr(prime, newBitwidth))
 
     r = random.randint(0, prime - 1)
     rhsStr = constExpr(r, newBitwidth)
 
-    # generate string representing '(a1x1 + a2x2 + ...) mod p = r'
     constraint = eqExpr(lhsStr, rhsStr)
-    return constraint, prime
+    return constraint, primeCoeffDecl, prime
 
 
 # Function: parseSmt2File
 # @param: smt2File - input SMT2 file
-#
 # @return: varmap - a map containing as key the names of the variables and value as their bitwidth
 # @return: smtFilePrefix - string containing the initial part of smt2File (until start of 'assert' in 'smt2File')
-# @return: assertLine - the first 'assert' line in 'smt2File'
 #
 # Creates variable map and also copies the initial part of SMT2 file (until start of 'assert' in 'smt2File')
 # This would later be appended with our constraints to create the new SMT2 file
@@ -209,15 +195,12 @@ def parseSmt2FileVariables(smt2File):
     return varMap, smtFilePrefix, assertLine
 
 
-# Function: parseSmt2FileSuffix
+# Function: parseSmt2File
 # @param: smt2File - input SMT2 file
 # @param: newConstraints - string which is a SMT2 constraint
-#
 # @return: smtFileSuffix - string containing our constraints followed by rest of input file
 #
 # returns a string after our adding our constraints to the rest of the input file
-#
-# TODO: why are adding 'newConstraints' here which is basically 'true' when called
 def parseSmt2FileSuffix(smt2File, newConstraints):
     compiledCheckSatPattern = re.compile("check-sat")
 
@@ -237,19 +220,12 @@ def parseSmt2FileSuffix(smt2File, newConstraints):
     return smtFileSuffix
 
 # Function: generateSMT2FileFromConstraints
-# @param: smt2prefix - prefix portion of input smt2 file (this contains all lines
-#         of smt2 file until the first 'assert')
-# @param: assertLine - the assert line returned by function 'parseSmt2FileVariables'
-# @param: constraintList - a list of generated constraints
-# @param: smt2suffix - rest of input smt2 file
-# @param: outFileName - name of generated output smt2 file
-#
-# The function generates an smt2 files after adding our constraints to the
-# original input file
-
-def generateSMT2FileFromConstraints(smt2prefix, assertLine, constraintList, smt2suffix, outFileName):
-    outputSMT2File = open(outFileName, "w")
+def generateSMT2FileFromConstraints(smt2prefix, coeffDeclList, lastAssertLine, constraintList, smt2suffix, tempFileName):
+    outputSMT2File = open(tempFileName, "w")
     outputSMT2File.write(smt2prefix)
+
+    for decl in coeffDeclList:
+        outputSMT2File.write(decl)
 
     outputSMT2File.write("(assert")
 
@@ -257,31 +233,19 @@ def generateSMT2FileFromConstraints(smt2prefix, assertLine, constraintList, smt2
     outputSMT2File.write(strConstraints)
 
     outputSMT2File.write(")\n")
-    outputSMT2File.write(assertLine)
+    outputSMT2File.write(lastAssertLine)
     outputSMT2File.write(smt2suffix)
 
     outputSMT2File.close()
 
 
 # Function: generateSMT1FromSMT2File
-# @param: smt2FileName - name of generated smt2 file
-# @param: smt1FileName - name of output smt1 file from smt2 file
-#
-# @return: status of executing the command which generated the smt2 file
-#
-# The function generates an smt1 equivalent file from given smt2 file.
-# This is required by boolector since it does not support incremental mode in
-# SMT2 files
 def generateSMT1FromSMT2File(smt2FileName, smt1FileName):
     cmd = "boolector -ds1 -o " + smt1FileName + " " + smt2FileName
     return os.system(cmd)
 
 
 # Funtion: countSolutions
-# @param: smtResultsFileName - name of file containing 'sat' for each model
-#         generated
-#
-# Counts the number of 'sat' in smtResultsFile which gives the number of models
 def countSolutions(smtResultsFileName):
     smtResultsFile = open(smtResultsFileName, "r")
     count = 0
@@ -292,17 +256,7 @@ def countSolutions(smtResultsFileName):
 
     return count
 
-# Function: getCommonPrimesAndMedian
-# @param: runResults - a tuple containing number of solutions and counter of
-#         primes
-# @param: logFile - file on which log is written
-#
-# @return: list of common primes among all runs
-# @return: median of remaining non-common elements
-#
-# For each run 'runResults' contains the list of primes and number of solutions
-# generated in the last case. This function extracts out the common primes of
-# all the runs and median of number of solutions times the non-common primes
+
 def getCommonPrimesAndMedian(runResults, logFile):
     commonPrimes = runResults[0][1]
     for i in range(1, len(runResults)):
@@ -328,6 +282,8 @@ def getCommonPrimesAndMedian(runResults, logFile):
 
 # Function: main
 def main(argv):
+    generateEquationConstraint.counter = 0;
+
     # check for correct number of arguments
     scriptName = os.path.basename(__file__)
     if len(argv) < 6:
@@ -335,20 +291,24 @@ def main(argv):
         sys.stderr.write("    [Usage]: " + scriptName + " <input_SMT2_file> <primes_file> <num_iterations> <log_file> <output_file>\n")
         sys.exit(1)
 
-    # open necessary files
+    # open files
     inputSMTFile = open(argv[1], "r")
     primesFile = open(argv[2], "r")
     numIterations = int(argv[3])
     logFile = open(argv[4], "w", 1)
     finalOutputFile = open(argv[5], "w", 1)
+    # probMapFile = open(argv[3], "r")
 
     primesMap = populatePrimesMap(primesFile)
+    # epsilonMap = populateEpsilonMap(probMapFile)
 
     (varMap, smt2prefix, lastAssertLine) = parseSmt2FileVariables(inputSMTFile)
     smt2suffix = parseSmt2FileSuffix(inputSMTFile, "true")
 
     maxBitwidth = max(varMap.values())
+    # print("maxBitwidth: " + str(maxBitwidth))
 
+    # find pivot solutions
     tempDir = os.getcwd() + "/temp_amc"
     smtSolver = os.path.dirname(os.path.realpath(__file__)) + "/../boolector-mc/boolector/boolector"
 
@@ -357,8 +317,10 @@ def main(argv):
 
     timeout = 2400
     minPivot = 1
-    epsilon = 0.8
+
+    epsilon = 0.8 # epsilonMap[maxBitwidth]
     maxPivot = int(2*math.ceil(4.94*(1+1/epsilon)*(1+1/epsilon)))
+    # print("maxPivot: " + str(maxPivot))
 
     scriptStartTime = os.times()
     logFile.write("Script start time: " + str(scriptStartTime) + "\n")
@@ -368,41 +330,36 @@ def main(argv):
     logFile.write("maxPivot: " + str(maxPivot) + "\n")
 
 
-    iterationRunResults = [] # list storing all primes and number of solutions for all iterations
-    timedOutRuns = set() # set containing the iterations which timed out
+    iterationRunResults = []
+    timedOutRuns = set()
     for i in range(numIterations):
-        tempSMT2FileNamePrefix = tempDir + "/temp_" + str(i)
-        tempOutputFilePrefix = tempDir + "/solverResults_" + str(i)
-        tempErrorFilePrefix = tempDir + "/solverErrors_" + str(i)
-        tempSMT1FileNamePrefix = tempDir + "/temp_" + str(i)
+        tempSMT2FileName = tempDir + "/temp_" + str(i) + ".smt2"
+        tempOutputFile = tempDir + "/solverResults_" + str(i) + ".txt"
+        tempErrorFile = tempDir + "/solverErrors_" + str(i) + ".txt"
+        tempSMT1FileName = tempDir + "/temp_" + str(i) + ".smt1"
 
-        slices = 2 # we begin by slicing each variable into 2 slices
+        slices = 2
 
         logFile.write("\n\n################################################################################\n")
         logFile.write("Iteration: " + str(i) + "\n")
         
         constraintList = []
+        coeffDeclList = []
         primeList = []
 
-        (constraint, prime) = generateEquationConstraint(varMap, primesMap, maxBitwidth, slices)
+        (constraint, coeffDecl, prime) = generateEquationConstraint(varMap, primesMap, maxBitwidth, slices)
         constraintList.append(constraint)
+        coeffDeclList.append(coeffDecl)
+
         primeList.append(prime)
 
         innerLoopRun = 0
-        foundCounts = False
-        savePrime = 0
-        saveNumSolutions = -1
-
         while True:
             logFile.write("\n----\n")
             logFile.write("innerLoopRun: " + str(innerLoopRun) + "\n")
-            tempSMT2FileName = tempSMT2FileNamePrefix + "_" + str(innerLoopRun) + ".smt2"
-            tempSMT1FileName = tempSMT1FileNamePrefix + "_" + str(innerLoopRun) + ".smt1"
-            tempOutputFile = tempOutputFilePrefix + "_" + str(innerLoopRun) + ".txt"
-            tempErrorFile = tempErrorFilePrefix + "_" + str(innerLoopRun) + ".txt"
             innerLoopRun += 1
 
-            generateSMT2FileFromConstraints(smt2prefix, lastAssertLine, constraintList, smt2suffix, tempSMT2FileName)
+            generateSMT2FileFromConstraints(smt2prefix, coeffDeclList, lastAssertLine, constraintList, smt2suffix, tempSMT2FileName)
             conversionResult = generateSMT1FromSMT2File(tempSMT2FileName, tempSMT1FileName)
             if conversionResult != 0:
                 sys.stderr.write("Error while converting from SMT2 File to SMT1 file. Aborting ...\n")
@@ -420,7 +377,6 @@ def main(argv):
             logFile.write("startTime: " + str(startTime) + "\n")
             logFile.write("endTime: " + str(endTime) + "\n")
             logFile.write("cmd time: " + str(endTime.elapsed - startTime.elapsed) + "\n")
-            logFile.write("Current prime list: " + str(primeList) + "\n")
 
             hasTimedOut = False
             if (endTime.elapsed - startTime.elapsed) > (timeout - 10):
@@ -431,48 +387,30 @@ def main(argv):
             logFile.write("numConstraints: " + str(len(constraintList)) + ", slices: " + str(slices) + ", numSolutions: " + str(numSolutions) + ", hasTimedOut: " + str(hasTimedOut) + "\n")
         
             if numSolutions >= maxPivot:
-                if foundCounts:
-                    logFile.write("Stopping after foundCounts = True and numSolutions >= maxPivot\n")
-                    primeList.pop();
-                    primeList.append(savePrime) # restore previous prime
-                    numSolutions = saveNumSolutions # restore previous count of solutions
-                    break
-                
-                (constraint, prime) = generateEquationConstraint(varMap, primesMap, maxBitwidth, slices)
+                (constraint, coeffDecl, prime) = generateEquationConstraint(varMap, primesMap, maxBitwidth, slices)
                 constraintList.append(constraint)
+                coeffDeclList.append(coeffDecl)
                 primeList.append(prime)
 
             elif numSolutions >= minPivot and not hasTimedOut:
-                foundCounts = True
-
-                if (slices >= maxBitwidth):
-                    logFile.write("Stopping after foundCounts = True and no further slices possible\n")
-                    break
-
-                constraintList.pop()
-                coeffDeclList.pop()
-                savePrime = primeList.pop()
-                saveNumSolutions = numSolutions
-
-                slices = (slices * 2) if (slices * 2) < maxBitwidth else maxBitwidth
-
-                (constraint, prime) = generateEquationConstraint(varMap, primesMap, maxBitwidth, slices)
-                constraintList.append(constraint)
-                primeList.append(prime)
+                break;
 
             elif numSolutions >= 0:
+                constraintList.pop()
+                coeffDeclList.pop()
+                primeList.pop()
+
                 if (slices >= maxBitwidth):
                     if hasTimedOut:
                         timedOutRuns.add(i)
+                        # logFile.write("hasTimedOut after adding last constraint: " + str(hasTimedOut) + "\n")
                     break
-
-                constraintList.pop()
-                primeList.pop()
 
                 slices = (slices * 2) if (slices * 2) < maxBitwidth else maxBitwidth;
 
-                (constraint, prime) = generateEquationConstraint(varMap, primesMap, maxBitwidth, slices)
+                (constraint, coeffDecl, prime) = generateEquationConstraint(varMap, primesMap, maxBitwidth, slices)
                 constraintList.append(constraint)
+                coeffDeclList.append(coeffDecl)
                 primeList.append(prime)
 
             logFile.flush()
@@ -504,6 +442,5 @@ def main(argv):
     logFile.close()
 
 
-# program entry - call main function
 if __name__ == "__main__":
     main(sys.argv)
