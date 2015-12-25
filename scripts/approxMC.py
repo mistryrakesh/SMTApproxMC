@@ -324,13 +324,126 @@ def getCommonPrimesAndMedian(runResults, logFile):
 
     logFile.write("valList: " + str(valList) + "\n")
     return (list(commonPrimes.elements()), numpy.median(valList))
+
+
+# Function: modelCounter
+# Approximate model counter for a given smt2 input file
+def modelCounter(varMap, primesMap, maxBitwidth, slices, smt2prefix, assertLine, smt2suffix, timeout, minPivot, maxPivot, logFile, tempDir, i):
+    smtSolver = os.path.dirname(os.path.realpath(__file__)) + "/../boolector-mc/boolector/boolector"
+
+    tempSMT2FileNamePrefix = tempDir + "/temp_" + str(i)
+    tempOutputFilePrefix = tempDir + "/solverResults_" + str(i)
+    tempErrorFilePrefix = tempDir + "/solverErrors_" + str(i)
+    tempSMT1FileNamePrefix = tempDir + "/temp_" + str(i)
+
+    constraintList = [] # list of constraints each of form '(a1x1 + a2x2 + ...) mod p = r'
+    primeList = [] # list of primes 'p' used to generate the constraints
+
+    (constraint, prime) = generateEquationConstraint(varMap, primesMap, maxBitwidth, slices)
+    constraintList.append(constraint)
+    primeList.append(prime)
+
+    innerLoopRun = 0 # loop counter
+    foundCounts = False # set to true when 0 < #sols < maxPivots
+    savePrime = 0
+    saveNumSolutions = -1
+
+    while True:
+        logFile.write("\n----\n")
+        logFile.write("innerLoopRun: " + str(innerLoopRun) + "\n")
+        
+        tempSMT2FileName = tempSMT2FileNamePrefix + "_" + str(innerLoopRun) + ".smt2"
+        tempSMT1FileName = tempSMT1FileNamePrefix + "_" + str(innerLoopRun) + ".smt1"
+        tempOutputFile = tempOutputFilePrefix + "_" + str(innerLoopRun) + ".txt"
+        tempErrorFile = tempErrorFilePrefix + "_" + str(innerLoopRun) + ".txt"
+        innerLoopRun += 1
+
+        # generate smt1 file after adding our constraints
+        generateSMT2FileFromConstraints(smt2prefix, assertLine, constraintList, smt2suffix, tempSMT2FileName)
+        conversionResult = generateSMT1FromSMT2File(tempSMT2FileName, tempSMT1FileName)
+        if conversionResult != 0:
+            sys.stderr.write("Error while converting from SMT2 File to SMT1 file. Aborting ...\n")
+            logFile.write("Error while converting from SMT2 File to SMT1 file. Aborting ...\n")
+            logFile.close()
+            exit(1)
+
+        # call boolector for model counting
+        cmd = "doalarm -t profile " + str(timeout) + " " + smtSolver + " -i -m --maxsolutions=" + str(maxPivot) + " " + tempSMT1FileName + " >" + tempOutputFile + " 2>>" + tempErrorFile;
+        logFile.write("cmd: " + cmd + "\n")
+        
+        startTime = os.times()
+        os.system(cmd)
+        endTime = os.times()
+
+        logFile.write("startTime: " + str(startTime) + "\n")
+        logFile.write("endTime: " + str(endTime) + "\n")
+        logFile.write("cmd time: " + str(endTime.elapsed - startTime.elapsed) + "\n")
+        logFile.write("Current prime list: " + str(primeList) + "\n")
+
+        hasTimedOut = False
+        if (endTime.elapsed - startTime.elapsed) > (timeout - 10):
+            hasTimedOut = True
+
+        numSolutions = countSolutions(tempOutputFile)
+
+        logFile.write("numConstraints: " + str(len(constraintList)) + ", slices: " + str(slices) + ", numSolutions: " + str(numSolutions) + ", hasTimedOut: " + str(hasTimedOut) + "\n")
     
 
+        if numSolutions >= maxPivot:
+            if foundCounts:
+                logFile.write("Stopping after foundCounts = True and numSolutions >= maxPivot\n")
+                primeList.pop();
+                primeList.append(savePrime) # restore previous prime
+                numSolutions = saveNumSolutions # restore previous count of solutions
+                break
+            
+            (constraint, prime) = generateEquationConstraint(varMap, primesMap, maxBitwidth, slices)
+            constraintList.append(constraint)
+            primeList.append(prime)
+
+        elif numSolutions >= minPivot and not hasTimedOut:
+            foundCounts = True
+
+            if (slices >= maxBitwidth):
+                logFile.write("Stopping after foundCounts = True and no further slices possible\n")
+                break
+
+            constraintList.pop()
+            savePrime = primeList.pop()
+            saveNumSolutions = numSolutions
+
+            slices = (slices * 2) if (slices * 2) < maxBitwidth else maxBitwidth
+
+            (constraint, prime) = generateEquationConstraint(varMap, primesMap, maxBitwidth, slices)
+            constraintList.append(constraint)
+            primeList.append(prime)
+
+        elif numSolutions >= 0:
+            if (slices >= maxBitwidth):
+                if hasTimedOut:
+                    timedOutRuns.add(i)
+                break
+
+            constraintList.pop()
+            primeList.pop()
+
+            slices = (slices * 2) if (slices * 2) < maxBitwidth else maxBitwidth;
+
+            (constraint, prime) = generateEquationConstraint(varMap, primesMap, maxBitwidth, slices)
+            constraintList.append(constraint)
+            primeList.append(prime)
+
+        logFile.flush()
+
+    return (numSolutions, collections.Counter(primeList))
+
+
 # Function: main
+# @param: argv - command line arguments
 def main(argv):
     # check for correct number of arguments
     scriptName = os.path.basename(__file__)
-    if len(argv) < 6:
+    if len(argv) != 6:
         sys.stderr.write("Error: Invalid arguments.\n")
         sys.stderr.write("    [Usage]: " + scriptName + " <input_SMT2_file> <primes_file> <num_iterations> <log_file> <output_file>\n")
         sys.exit(1)
@@ -344,17 +457,17 @@ def main(argv):
 
     primesMap = populatePrimesMap(primesFile)
 
-    (varMap, smt2prefix, lastAssertLine) = parseSmt2FileVariables(inputSMTFile)
+    (varMap, smt2prefix, assertLine) = parseSmt2FileVariables(inputSMTFile)
     smt2suffix = parseSmt2FileSuffix(inputSMTFile, "true")
 
     maxBitwidth = max(varMap.values())
 
     tempDir = os.getcwd() + "/temp_amc"
-    smtSolver = os.path.dirname(os.path.realpath(__file__)) + "/../boolector-mc/boolector/boolector"
 
     if not os.path.exists(tempDir):
         os.makedirs(tempDir)
 
+    # define some constants
     timeout = 2400
     minPivot = 1
     epsilon = 0.8
@@ -367,118 +480,18 @@ def main(argv):
     logFile.write("Epsilon: " + str(epsilon) + "\n")
     logFile.write("maxPivot: " + str(maxPivot) + "\n")
 
-
     iterationRunResults = [] # list storing all primes and number of solutions for all iterations
     timedOutRuns = set() # set containing the iterations which timed out
-    for i in range(numIterations):
-        tempSMT2FileNamePrefix = tempDir + "/temp_" + str(i)
-        tempOutputFilePrefix = tempDir + "/solverResults_" + str(i)
-        tempErrorFilePrefix = tempDir + "/solverErrors_" + str(i)
-        tempSMT1FileNamePrefix = tempDir + "/temp_" + str(i)
 
+    for i in range(numIterations):
         slices = 2 # we begin by slicing each variable into 2 slices
 
         logFile.write("\n\n################################################################################\n")
         logFile.write("Iteration: " + str(i) + "\n")
-        
-        constraintList = []
-        primeList = []
 
-        (constraint, prime) = generateEquationConstraint(varMap, primesMap, maxBitwidth, slices)
-        constraintList.append(constraint)
-        primeList.append(prime)
+        # perform approximate model counting
+        iterationRunResults.append(modelCounter(varMap, primesMap, maxBitwidth, slices, smt2prefix, assertLine, smt2suffix, timeout, minPivot, maxPivot, logFile, tempDir, i))
 
-        innerLoopRun = 0
-        foundCounts = False
-        savePrime = 0
-        saveNumSolutions = -1
-
-        while True:
-            logFile.write("\n----\n")
-            logFile.write("innerLoopRun: " + str(innerLoopRun) + "\n")
-            tempSMT2FileName = tempSMT2FileNamePrefix + "_" + str(innerLoopRun) + ".smt2"
-            tempSMT1FileName = tempSMT1FileNamePrefix + "_" + str(innerLoopRun) + ".smt1"
-            tempOutputFile = tempOutputFilePrefix + "_" + str(innerLoopRun) + ".txt"
-            tempErrorFile = tempErrorFilePrefix + "_" + str(innerLoopRun) + ".txt"
-            innerLoopRun += 1
-
-            generateSMT2FileFromConstraints(smt2prefix, lastAssertLine, constraintList, smt2suffix, tempSMT2FileName)
-            conversionResult = generateSMT1FromSMT2File(tempSMT2FileName, tempSMT1FileName)
-            if conversionResult != 0:
-                sys.stderr.write("Error while converting from SMT2 File to SMT1 file. Aborting ...\n")
-                logFile.write("Error while converting from SMT2 File to SMT1 file. Aborting ...\n")
-                logFile.close()
-                exit(1)
-
-            cmd = "doalarm -t profile " + str(timeout) + " " + smtSolver + " -i -m  --maxsolutions=" + str(maxPivot) + " " + tempSMT1FileName + " >" + tempOutputFile + " 2>>" + tempErrorFile;
-            logFile.write("cmd: " + cmd + "\n")
-            
-            startTime = os.times()
-            os.system(cmd)
-            endTime = os.times()
-
-            logFile.write("startTime: " + str(startTime) + "\n")
-            logFile.write("endTime: " + str(endTime) + "\n")
-            logFile.write("cmd time: " + str(endTime.elapsed - startTime.elapsed) + "\n")
-            logFile.write("Current prime list: " + str(primeList) + "\n")
-
-            hasTimedOut = False
-            if (endTime.elapsed - startTime.elapsed) > (timeout - 10):
-                hasTimedOut = True
-
-            numSolutions = countSolutions(tempOutputFile)
-
-            logFile.write("numConstraints: " + str(len(constraintList)) + ", slices: " + str(slices) + ", numSolutions: " + str(numSolutions) + ", hasTimedOut: " + str(hasTimedOut) + "\n")
-        
-            if numSolutions >= maxPivot:
-                if foundCounts:
-                    logFile.write("Stopping after foundCounts = True and numSolutions >= maxPivot\n")
-                    primeList.pop();
-                    primeList.append(savePrime) # restore previous prime
-                    numSolutions = saveNumSolutions # restore previous count of solutions
-                    break
-                
-                (constraint, prime) = generateEquationConstraint(varMap, primesMap, maxBitwidth, slices)
-                constraintList.append(constraint)
-                primeList.append(prime)
-
-            elif numSolutions >= minPivot and not hasTimedOut:
-                foundCounts = True
-
-                if (slices >= maxBitwidth):
-                    logFile.write("Stopping after foundCounts = True and no further slices possible\n")
-                    break
-
-                constraintList.pop()
-                coeffDeclList.pop()
-                savePrime = primeList.pop()
-                saveNumSolutions = numSolutions
-
-                slices = (slices * 2) if (slices * 2) < maxBitwidth else maxBitwidth
-
-                (constraint, prime) = generateEquationConstraint(varMap, primesMap, maxBitwidth, slices)
-                constraintList.append(constraint)
-                primeList.append(prime)
-
-            elif numSolutions >= 0:
-                if (slices >= maxBitwidth):
-                    if hasTimedOut:
-                        timedOutRuns.add(i)
-                    break
-
-                constraintList.pop()
-                primeList.pop()
-
-                slices = (slices * 2) if (slices * 2) < maxBitwidth else maxBitwidth;
-
-                (constraint, prime) = generateEquationConstraint(varMap, primesMap, maxBitwidth, slices)
-                constraintList.append(constraint)
-                primeList.append(prime)
-
-            logFile.flush()
-            # raw_input("Press Enter to continue...")
-
-        iterationRunResults.append((numSolutions, collections.Counter(primeList)))
 
     scriptEndTime = os.times()
     logFile.write("Script end time: " + str(scriptEndTime) + "\n")
@@ -486,9 +499,13 @@ def main(argv):
 
     logFile.write("iterationRunResults: " + str(iterationRunResults) + "\n")
 
+    # compute primes and median from all iterations
     (commonPrimes, med) = getCommonPrimesAndMedian(iterationRunResults, logFile)
+
     logFile.write("commonPrimes: " + str(commonPrimes) + ", median: " + str(med) + ", ")
 
+    # write important results in 'finalOutputFile' which is of the form
+    #     <maxBitwidth> ; <list_of_common_primes>,<median> ; <total_time_of_script> ; <# timed_out_iterations> ; <list_of_iterations_timed_out>
     finalOutputFile.write(str(maxBitwidth) + ";")
     for primes in commonPrimes:
         finalOutputFile.write(str(primes) + ",")
