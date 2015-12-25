@@ -6,4 +6,4 @@
 The script requires the following to run:
 
   1. Python 3
-  2. doalarm -- (https://directory.fsf.org/wiki/Doalarm)[requires the following to be present]
+  2. doalarm -- [https://directory.fsf.org/wiki/Doalarm](https://directory.fsf.org/wiki/Doalarm)
