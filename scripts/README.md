@@ -16,5 +16,6 @@ Currently the SMT2 parser is very limited and only supports QF\_BV SMT2 file of 
 
 ### Prerequisites ###
 The script requires the following to run:
+
   1. Python 3
   2. doalarm - [https://directory.fsf.org/wiki/Doalarm](https://directory.fsf.org/wiki/Doalarm)
