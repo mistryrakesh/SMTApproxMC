@@ -1,7 +1,7 @@
 # README #
 
 ApproxMC for SMT Solvers.
-
+Authors: Supratik Chakraborty, Kuldeep S Meel, Rakesh Mistry, Moshe Y Vardi
 ### Files changed in CVC4 ###
 
   1. src/expr/command.cpp (line 999)  
