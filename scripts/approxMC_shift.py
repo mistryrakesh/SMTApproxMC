@@ -253,10 +253,10 @@ def getCommonLsAndMedian(runResults, logFile):
         if subResult == None:
             valList.append(runResults[i][0])
         else:
-            prod = 1
+            sum = 0
             for key in subResult:
-                prod = prod * (key ** subResult[key])
-            valList.append(prod * runResults[i][0])
+                sum = sum + (key * subResult[key])
+            valList.append((2 ** sum) * runResults[i][0])
 
     logFile.write("valList: " + str(valList) + "\n")
     return (list(commonLs.elements()), numpy.median(valList))
@@ -420,7 +420,7 @@ def main(argv):
     timedOutRuns = set() # set containing the iterations which timed out
 
     for i in range(numIterations):
-        l = k - 1 # start with division by 2
+        l = k # start with division by 2
 
         logFile.write("\n\n################################################################################\n")
         logFile.write("Iteration: " + str(i) + "\n")
