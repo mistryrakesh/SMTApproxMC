@@ -80,7 +80,7 @@ def generateCoeff(n, p):
 # @param: l - amount to shift
 #
 # Generates an equation of the form:
-#     (a1x1 + a2x2 + ...) div 2^(k-l) = r
+#     (a1x1 + a2x2 + ... + b) div 2^(k-l) = r
 def generateEquationConstraint(varMap, prime, k, l):
 
     bvmulList = []
@@ -93,16 +93,20 @@ def generateEquationConstraint(varMap, prime, k, l):
         bvmulStrs = [] # list of strings representing each 'aixi'
         bvmulList.append(bvmulExpr(constExpr(coeff[0], k), key))
 
-    # generate string representing 'a1x1 + a2x2 + ...'
+    # add constant 'b'
+    b = random.randint(0, 2 ** k)
+    bvmulList.append(constExpr(b, k))
+        
+    # generate string representing 'a1x1 + a2x2 + ... + b'
     lhsStr = functools.reduce(lambda x, y: bvaddExpr(x, y), bvmulList)
 
-    # generate string representing '(a1x1 + a2x2 + ...) bvlshr (k - l)'
+    # generate string representing '(a1x1 + a2x2 + ... + b) bvlshr (k - l)'
     lhsStr = bvlshrExpr(lhsStr, constExpr(int(k - l), k))
 
     r = random.randint(0, 2 ** l)
     rhsStr = constExpr(r, k)
 
-    # generate string representing '(a1x1 + a2x2 + ...) mod p = r'
+    # generate string representing '(a1x1 + a2x2 + ... + b) rshift p = r'
     constraint = eqExpr(lhsStr, rhsStr)
     return constraint
 
@@ -348,7 +352,7 @@ def modelCounter(varMap, prime, k, l, smt2prefix, assertLine, smt2suffix, timeou
             saveL = lList.pop()
             saveNumSolutions = numSolutions
 
-            l = int((l / 2) if (l / 2) > 1 else 1)
+            l = int((l - 1) if (l - 1) > 1 else 1)
 
             constraint = generateEquationConstraint(varMap, prime, k, l)
             constraintList.append(constraint)
@@ -363,7 +367,7 @@ def modelCounter(varMap, prime, k, l, smt2prefix, assertLine, smt2suffix, timeou
             constraintList.pop()
             lList.pop()
 
-            l = int((l / 2) if (l / 2) > 1 else 1)
+            l = int((l - 1) if (l - 2) > 1 else 1)
 
             constraint = generateEquationConstraint(varMap, prime, k, l)
             constraintList.append(constraint)
